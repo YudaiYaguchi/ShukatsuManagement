@@ -8,6 +8,11 @@ let id = 0;
 const companiesName = ref([]);
 provide("companiesName",companiesName);
 const companyName = ref('');
+const companyInfo = ref(null); // ref(null)に変更
+provide("companyInfo",companyInfo);
+
+
+
 
 
 const getCompanyName = async () => {
@@ -25,7 +30,7 @@ const addCompany = async () => {
     if(companyName.value.length != 0 && companyName.value != '　' && companyName.value != ' '){
         const {data, error} = await supabase.from('CompaniesName').insert([{companyName: companyName.value}]) .select('*');
         console.log(data);
-        companiesName.value.unshift(data);
+        companiesName.value.push(data);
         companyName.value = '';
     }else{
         alert('企業名を入力してください。');
@@ -51,6 +56,15 @@ const updateCompanyName = async (companyName) => {
   const currentComapnyName = companiesName.value.find((companyName) => companyName.id === data[0].id);
   currentComapnyName.completed = data[0].completed;
 };
+
+const getCompanyInfo = async(company) =>{
+  companyInfo.value = company;
+  console.log(companyInfo.value);
+  
+};
+
+
+
 </script>
 
 <template>
@@ -64,14 +78,20 @@ const updateCompanyName = async (companyName) => {
   <Search/>
 
   <ul>
-    <li v-for="companyName in companiesName" :key="companyName.id" :style="companyName.completed ? 'text-decoration:line-through;' : ''">
-      <span><input type="checkbox" v-model="companyName.completed" @change="updateCompanyName(companyName)" /></span>
-      <span>{{ companyName.companyName }} 　 </span>
-      <button class="button" @click="deleteCompanyName(companyName.id)">削除</button>
+    <li v-for="company in companiesName" :key="company.id" :style="company.completed ? 'text-decoration:line-through;' : ''">
+      <!--<span><input type="checkbox" v-model="company.completed" @change="updateCompanyName(company)" /></span>-->
+      <span><router-link :to="'/company-detail/' + company.id">{{ company.companyName }}</router-link></span>
+      <button class="button" @click="deleteCompanyName(company.id)">削除</button>
     </li>
   </ul>
 
 </template>
+
+<script>
+export default {
+  name: 'Home',
+};
+</script>
 
 <style scoped>
 .button {

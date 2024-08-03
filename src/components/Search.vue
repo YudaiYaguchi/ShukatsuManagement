@@ -7,15 +7,13 @@ const hitCompaniesName = ref([]);
 
 // 検索関数
 const searchFunc = () => {
-
   if(keyword.value.length >= 1){
     hitCompaniesName.value = companiesName.value.filter(company =>
       company.companyName.includes(keyword.value)
     );
   }else{
-    hitCompaniesName.value.length = 0;//配列の中を空にする
+    hitCompaniesName.value = []; // 配列の中を空にする
   }
-  
 };
 
 // キーワードが変更されたときに検索関数を呼び出す
@@ -29,7 +27,7 @@ watch(keyword, searchFunc, { immediate: true });
   <div>
     <table>
       <tr v-for="company in hitCompaniesName" :key="company.id">
-        <td>{{ company.companyName }}</td>
+        <td><router-link :to="'/company-detail/' + company.id">{{ company.companyName }}</router-link></td>
       </tr>
     </table>
   </div>

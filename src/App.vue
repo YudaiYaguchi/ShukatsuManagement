@@ -1,8 +1,15 @@
-<script setup>
-  import Home from './components/Home.vue'
-</script>
-
 <template>
-  <Home />
+  <div id="app">
+    <router-view></router-view>
+  </div>
 </template>
 
+<script>
+export default {
+  name: 'App',
+};
+</script>
+
+<style> 
+/* スタイルはここに追加 */
+</style>
