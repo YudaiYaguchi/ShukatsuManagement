@@ -57,13 +57,6 @@ const updateCompanyName = async (companyName) => {
   currentComapnyName.completed = data[0].completed;
 };
 
-const getCompanyInfo = async(company) =>{
-  companyInfo.value = company;
-  console.log(companyInfo.value);
-  
-};
-
-
 
 </script>
 
@@ -80,7 +73,7 @@ const getCompanyInfo = async(company) =>{
   <ul>
     <li v-for="company in companiesName" :key="company.id" :style="company.completed ? 'text-decoration:line-through;' : ''">
       <!--<span><input type="checkbox" v-model="company.completed" @change="updateCompanyName(company)" /></span>-->
-      <span><router-link :to="'/company-detail/' + company.id">{{ company.companyName }}</router-link></span>
+      <span><router-link :to="'/company-detail/' + company.id">{{ company.companyName }}</router-link>　</span>
       <button class="button" @click="deleteCompanyName(company.id)">削除</button>
     </li>
   </ul>
