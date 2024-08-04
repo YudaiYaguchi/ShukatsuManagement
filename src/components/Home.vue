@@ -61,7 +61,9 @@ const updateCompanyName = async (companyName) => {
 </script>
 
 <template>
+  <div class="header">
   <h1>就活管理</h1>
+  </div>
   <form @submit="addCompany">
     <div>
       <input v-model="companyName" /> <button type="submit">企業を登録</button>
@@ -89,5 +91,11 @@ export default {
 <style scoped>
 .button {
     color: black;
+}
+
+.header{
+  background-color: rgb(29, 249, 9);
+  width: 100%;
+  padding: 0.1%;
 }
 </style>

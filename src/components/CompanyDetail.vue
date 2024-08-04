@@ -5,8 +5,13 @@ import { supabase } from '../supabase';
 
 const route = useRoute();
 const companyInfo = ref(null);
+const companiesInfo = ref([]);
 const companies = ref([]);
 const company = ref('');
+const flag = ref(true);
+const message = ref('　企業情報が登録されました');
+const textFlag = ref(false);
+
 
 // 特定の企業情報を取得する関数
 const getCompanyInfo = async (id) => {
@@ -36,7 +41,7 @@ const addCompanyURL = async (event) => {
       .update({ companyURL: company.value })
       .eq('id', companyInfo.value.id)
       .select('*');
-      
+    flag.value = false;
     if (error) {
       console.error('Error updating company URL:', error);
     } else {
@@ -55,6 +60,32 @@ const addCompanyURL = async (event) => {
   }
 };
 
+const addCompanyInfo = async (event) =>{
+  event.preventDefault();  // フォームのデフォルト動作を防ぐ
+    console.log("addCompanyInfo : " + companyInfo.value.companyInfo);
+
+    const { data, error } = await supabase
+      .from('CompaniesName')
+      .update({ companyInfo: companyInfo.value.companyInfo })
+      .eq('id', companyInfo.value.id)
+      .select('*');
+
+    if (error) {
+      console.error('Error updating company URL:', error);
+    } else {
+      console.log('Updated record:', data);
+    }
+}
+
+const tempText = ()=>{
+  textFlag.value = true;
+  window.setTimeout(() => {
+        //alert("3秒経過しました");
+        textFlag.value = false;
+    }, 3000);
+
+}
+
 // 企業情報をコンソールに表示する関数
 const getInfo = () => {
   console.log(companyInfo.value);
@@ -72,14 +103,42 @@ const getInfo = () => {
       </div>
     </form>
 
-      <p v-for="company in companies" :key="company.id">
+    <div v-if="companyInfo.companyURL">
+    <p v-if="flag">
+        マイページURL：<a :href="companyInfo.companyURL" target="_blank">{{ companyInfo.companyName }}</a>
+    </p>
+    <p v-else v-for="company in companies" :key="company.id">
         マイページURL：<a :href="company.companyURL" target="_blank">{{ company.companyName }}</a>
-      </p>
+    </p>
+    </div>
+    <p v-else>マイページURL：未登録</p>
     
+  
+  <p>企業研究</p>
+  <div v-if="companyInfo.companyInfo"></div>
+  <form @submit="addCompanyInfo">
+    <textarea v-model="companyInfo.companyInfo" placeholder="企業を研究して情報を残そう！！"></textarea>
+    <p>
+      <button type="submit" @click="tempText">企業研究を登録</button>
+      <em v-if="textFlag">{{ message }}</em>
+    </p>
+  </form>
+</div>
+<div v-else>
+  <form @submit="addCompanyInfo">
+    <textarea v-model="companyInfo.companyInfo" placeholder={{ companyInfo.companyInfo }}></textarea>
+    <p>
+      <button type="submit" @click="tempText">企業研究を登録</button>
+      <em v-if="textFlag">{{ message }}</em>
+    </p>
+  </form>
+</div>
 
-    <p>企業情報</p>
-    <textarea></textarea>
-  </div>
+
+
+
+
+
   <p v-else>Loading...</p>
 </template>
 
@@ -88,4 +147,5 @@ textarea {
   width: 50%;
   height: 300px;
 }
+
 </style>
