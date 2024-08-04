@@ -9,8 +9,9 @@ const companiesInfo = ref([]);
 const companies = ref([]);
 const company = ref('');
 const flag = ref(true);
-const message = ref('　企業情報が登録されました');
+const message = ref('登録されました');
 const textFlag = ref(false);
+const textFlagCompanyES = ref(false);
 
 
 // 特定の企業情報を取得する関数
@@ -33,7 +34,7 @@ onMounted(() => {
 
 // フォームサブミット時にURLを更新する関数
 const addCompanyURL = async (event) => {
-  event.preventDefault();  // フォームのデフォルト動作を防ぐ
+ event.preventDefault();  // フォームのデフォルト動作を防ぐ
   console.log(company.value);
   if (company.value.trim().length !== 0) {
     const { data, error } = await supabase
@@ -41,6 +42,8 @@ const addCompanyURL = async (event) => {
       .update({ companyURL: company.value })
       .eq('id', companyInfo.value.id)
       .select('*');
+    
+    companyInfo.value.companyURL = company.value;
     flag.value = false;
     if (error) {
       console.error('Error updating company URL:', error);
@@ -77,11 +80,38 @@ const addCompanyInfo = async (event) =>{
     }
 }
 
+const addCompanyES = async (event) =>{
+  event.preventDefault();  // フォームのデフォルト動作を防ぐ
+    console.log("addCompanyES : " + companyInfo.value.companyES);
+
+    const { data, error } = await supabase
+      .from('CompaniesName')
+      .update({ companyES: companyInfo.value.companyES })
+      .eq('id', companyInfo.value.id)
+      .select('*');
+
+    if (error) {
+      console.error('Error updating company URL:', error);
+    } else {
+      console.log('Updated record:', data);
+    }
+}
+
+
 const tempText = ()=>{
   textFlag.value = true;
   window.setTimeout(() => {
         //alert("3秒経過しました");
         textFlag.value = false;
+    }, 3000);
+
+}
+
+const tempTextCompanyES = ()=>{
+  textFlagCompanyES.value = true;
+  window.setTimeout(() => {
+        //alert("3秒経過しました");
+        textFlagCompanyES.value = false;
     }, 3000);
 
 }
@@ -95,8 +125,7 @@ const getInfo = () => {
 
 <template>
   <div v-if="companyInfo">
-    <h1>{{ companyInfo.companyName }}</h1>
-
+    <h1><router-link :to="'/'" class="custom-link">{{ companyInfo.companyName }}</router-link></h1>
     <form @submit="addCompanyURL">
       <div>
         <input v-model="company" placeholder="企業のマイページ等を登録"/><button type="submit">URLを登録</button>
@@ -104,41 +133,52 @@ const getInfo = () => {
     </form>
 
     <div v-if="companyInfo.companyURL">
-    <p v-if="flag">
+      <p>
         マイページURL：<a :href="companyInfo.companyURL" target="_blank">{{ companyInfo.companyName }}</a>
-    </p>
-    <p v-else v-for="company in companies" :key="company.id">
-        マイページURL：<a :href="company.companyURL" target="_blank">{{ company.companyName }}</a>
-    </p>
+      </p>
     </div>
     <p v-else>マイページURL：未登録</p>
     
-  
-  <p>企業研究</p>
-  <div v-if="companyInfo.companyInfo"></div>
-  <form @submit="addCompanyInfo">
-    <textarea v-model="companyInfo.companyInfo" placeholder="企業を研究して情報を残そう！！"></textarea>
-    <p>
-      <button type="submit" @click="tempText">企業研究を登録</button>
-      <em v-if="textFlag">{{ message }}</em>
-    </p>
-  </form>
-</div>
-<div v-else>
-  <form @submit="addCompanyInfo">
-    <textarea v-model="companyInfo.companyInfo" placeholder={{ companyInfo.companyInfo }}></textarea>
-    <p>
-      <button type="submit" @click="tempText">企業研究を登録</button>
-      <em v-if="textFlag">{{ message }}</em>
-    </p>
-  </form>
-</div>
+    <p>企業研究</p>
+    <div v-if="companyInfo.companyInfo !== undefined">
+      <form @submit="addCompanyInfo">
+        <textarea v-model="companyInfo.companyInfo" placeholder="企業を研究して情報を残そう！！"></textarea>
+        <p>
+          <button type="submit" @click="tempText">企業研究を登録</button>
+          <em v-if="textFlag">　企業研究が{{ message }}</em>
+        </p>
+      </form>
+    </div>
+    <div v-else>
+      <form @submit="addCompanyInfo">
+        <textarea v-model="companyInfo.companyInfo" placeholder="企業を研究して情報を残そう！！"></textarea>
+        <p>
+          <button type="submit" @click="tempText">企業研究を登録</button>
+          <em v-if="textFlag">　企業研究が{{ message }}</em>
+        </p>
+      </form>
+    </div>
 
-
-
-
-
-
+    <p>ES（エントリーシート）</p>
+    <div v-if="companyInfo.companyES !== undefined">
+      <form @submit="addCompanyES">  
+        <textarea v-model="companyInfo.companyES" placeholder="企業に提出したESを登録して振り返ろう！！"></textarea>
+        <p>
+          <button type="submit" @click="tempTextCompanyES">ESを登録</button>
+          <em v-if="textFlagCompanyES">　ESが{{ message }}</em>
+        </p>
+      </form>
+    </div>
+    <div v-else>
+      <form @submit="addCompanyES">  
+        <textarea v-model="companyInfo.companyES" placeholder="企業に提出したESを登録して振り返ろう！！"></textarea>
+        <p>
+          <button type="submit" @click="tempTextCompanyES">ESを登録</button>
+          <em v-if="textFlagCompanyES">　ESが{{ message }}</em>
+        </p>
+      </form>
+    </div>
+  </div>
   <p v-else>Loading...</p>
 </template>
 
@@ -148,4 +188,8 @@ textarea {
   height: 300px;
 }
 
+.custom-link {
+  color: black;
+  text-decoration: none;
+}
 </style>

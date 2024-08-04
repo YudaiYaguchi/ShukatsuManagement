@@ -64,7 +64,7 @@ const updateCompanyName = async (companyName) => {
   <div class="header">
   <h1>就活管理</h1>
   </div>
-  <form @submit="addCompany">
+  <form @submit="addCompany" >
     <div>
       <input v-model="companyName" /> <button type="submit">企業を登録</button>
     </div> 
