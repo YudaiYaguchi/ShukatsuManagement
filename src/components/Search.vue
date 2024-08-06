@@ -39,13 +39,18 @@ input {
   padding: 8px;
   width: 260px;
   box-sizing: border-box;
+  
 }
 table {
+  color: black;
   width: 260px;
   border-collapse: collapse;
 }
 td {
   padding: 8px;
-  border: 1px solid #ddd;
+  border: 2px solid white;
+  color: white;
 }
+
+
 </style>
