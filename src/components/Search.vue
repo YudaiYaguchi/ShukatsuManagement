@@ -48,8 +48,8 @@ table {
 }
 td {
   padding: 8px;
-  border: 2px solid white;
-  color: white;
+  border: 2px solid black;
+  color: black;
 }
 
 

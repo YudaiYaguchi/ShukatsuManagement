@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { supabase } from '../supabase';
+import Menu from './Menu.vue';
 
 const route = useRoute();
 const companyInfo = ref(null);
@@ -124,6 +125,8 @@ const getInfo = () => {
 </script>
 
 <template>
+  
+  <Menu/>
   <div v-if="companyInfo">
     <h1><router-link :to="'/'" class="custom-link">{{ companyInfo.companyName }}</router-link></h1>
     <form @submit="addCompanyURL">
@@ -131,6 +134,7 @@ const getInfo = () => {
         <input v-model="company" placeholder="企業のマイページ等を登録"/><button type="submit">URLを登録</button>
       </div>
     </form>
+
 
     <div v-if="companyInfo.companyURL">
       <p>
@@ -184,8 +188,8 @@ const getInfo = () => {
 
 <style>
 textarea {
-  width: 50%;
-  height: 300px;
+  width: 95%;
+  height: 500px;
 }
 
 .custom-link {

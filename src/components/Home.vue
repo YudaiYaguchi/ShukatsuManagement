@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { provide } from 'vue';
 import { supabase } from '../supabase'
 import Search from './Search.vue'
+import Menu from './Menu.vue'
 
 let id = 0;
 const companiesName = ref([]);
@@ -61,7 +62,8 @@ const updateCompanyName = async (companyName) => {
 </script>
 
 <template>
-  <div class="header">
+   <Menu/>
+  <div class="head">
   <h1>就活管理</h1>
   <p>ログインユーザー：○○さん</p>
   <form @submit="addCompany" >
@@ -70,17 +72,9 @@ const updateCompanyName = async (companyName) => {
     </div> 
   </form>
   
-  <Search/>
+  <Search/><!--Search.vue-->
 
-  <nav id="g_navi">
-	<ul>
-		<li><a href="/">ホーム</a></li>
-		<li><a href="/concept">コンセプト</a></li>
-		<li><a href="/menu">メニュー</a></li>
-		<li><a href="/access">アクセス</a></li>
-		<li><a href="/contact">お問い合わせ</a></li>
-	</ul>
-</nav>
+
 
 <div class="companyName">
   <ul>
@@ -105,7 +99,7 @@ export default {
     color: black;
 }
 
-.header{
+.head{
   background: #f0f2fd;;
   width: 100%;
   padding: 0.1%;
@@ -126,7 +120,7 @@ h1:before {
   top: -6px;
   left: 50%;
   width: 40%;
-  height: 58px;
+  height: 100%;
   border-radius: 50%;
   border: 5px solid #f70707;
   border-left-color: transparent;
@@ -153,51 +147,5 @@ h1:before {
   list-style-type: none!important;/*ポチ消す*/
 }
 
-
-#g_navi {
-	background: #6c98ef;
-}
-	#g_navi ul {
-		display: flex;
-		margin: 0 auto;
-		padding: 0 3%;
-		width: 94%;
-		max-width: 960px;
-		list-style-type: none;
-	}
-		#g_navi ul li {
-			position: relative;
-			width: 20%;
-		}
-		#g_navi ul li:first-child::before {
-			position: absolute;
-			display: block;
-			content: "";
-			top: 25%;
-			left: 0px;
-			width: 2px;
-			height: 50%;
-			background-color: #0c0c0b;
-		}
-		#g_navi ul li::after {
-			position: absolute;
-			display: block;
-			content: "";
-			top: 25%;
-			right: 0px;
-			width: 2px;
-			height: 50%;  
-			background-color: #000000;
-		}
-			#g_navi ul li a {
-				display: block;
-				padding: 17px 10px;
-				color: #000000;
-				text-align: center;
-				text-decoration: none;
-			}
-			#g_navi ul li a:hover {
-				background-color: #0879fb;
-			}
 
 </style>
