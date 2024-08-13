@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { supabase } from '../supabase';
-import Menu from './Menu.vue';
+import Menu from './Menu.vue'
 
 const route = useRoute();
 const companyInfo = ref(null);
