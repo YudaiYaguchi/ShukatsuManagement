@@ -1,6 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { provide } from 'vue';
+import { ref, onMounted, onUnmounted, provide } from 'vue';
 import { supabase } from '../supabase';
 import Search from './Search.vue';
 import Menu from './Menu.vue';
@@ -14,22 +13,27 @@ const companyName = ref('');
 const companyInfo = ref(null);
 provide("companyInfo", companyInfo);
 
-const isMobile = ref(false); // モバイル判定用フラグ
+const isMobile = ref(false);
+const editFlag = ref([]); 
+provide("editFlag", editFlag);
+
+let editId = ref(-1);
+provide("editId", editId);
 
 const getCompanyName = async () => {
   let { data, error, status } = await supabase.from('CompaniesName').select('*');
   console.log(data);
+  editFlag.value = data.map(() => false);
   companiesName.value = data;
 };
 
 getCompanyName();
 
 const addCompany = async () => {
-  console.log(companyName.value);
-  if (companyName.value.length != 0 && companyName.value != '　' && companyName.value != ' ') {
+  if (companyName.value.length !== 0 && companyName.value.trim() !== '') {
     const { data, error } = await supabase.from('CompaniesName').insert([{ companyName: companyName.value }]).select('*');
-    console.log(data);
-    companiesName.value.push(data);
+    companiesName.value.push(data[0]);
+    editFlag.value.push(false);
     companyName.value = '';
   } else {
     alert('企業名を入力してください。');
@@ -37,30 +41,44 @@ const addCompany = async () => {
 };
 
 const deleteCompanyName = async (id) => {
+  const result = window.confirm('本当に削除してもよろしいですか？\n削除された企業情報は復元できません。');
+if(result){
   const { data, error } = await supabase.from('CompaniesName').delete().eq('id', id).select('id');
-  const index = companiesName.value.findIndex((companyName) => companyName.id === data[0].id);
+  const index = companiesName.value.findIndex((company) => company.id === data[0].id);
   companiesName.value.splice(index, 1);
+  editFlag.value.splice(index, 1);
+}
 };
 
 const updateCompanyName = async (companyName) => {
   const { data, error } = await supabase.from('CompaniesName').update({ completed: companyName.completed }).eq('id', companyName.id).select('*');
-  const currentComapnyName = companiesName.value.find((companyName) => companyName.id === data[0].id);
-  currentComapnyName.completed = data[0].completed;
+  const index = companiesName.value.findIndex((company) => company.id === data[0].id);
+  companiesName.value[index].completed = data[0].completed;
 };
 
-// 画面サイズの変更を監視して、isMobile フラグを更新する
 const handleResize = () => {
   isMobile.value = window.innerWidth <= 768;
 };
 
 onMounted(() => {
-  handleResize(); // 初期判定
+  handleResize();
   window.addEventListener('resize', handleResize);
 });
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize);
 });
+
+const edit = (id) => {
+  const index = companiesName.value.findIndex((company) => company.id === id);
+  editFlag.value[index] = !editFlag.value[index];
+  editId.value = id; // ここで編集する企業の id をセット
+};
+
+const getEditFlag = (id) => {
+  const index = companiesName.value.findIndex((company) => company.id === id);
+  return editFlag.value[index];
+};
 </script>
 
 <template>
@@ -85,29 +103,48 @@ onUnmounted(() => {
           </tr>
         </table>
       </div>
+
       <!-- PC用のリスト -->
       <ul v-if="!isMobile">
         <li v-for="company in companiesName" :key="company.id" :style="company.completed ? 'text-decoration:line-through;' : ''">
-          <span><router-link :to="'/company-detail/' + company.id">{{ company.companyName }}</router-link>　</span>
-          <button class="button" @click="deleteCompanyName(company.id)">削除</button>
-          <Schedule/>
-          <Calendar/>
+          <div>
+            企業名：<span><router-link :to="'/company-detail/' + company.id">{{ company.companyName }}</router-link>　</span>
+            <button v-if="getEditFlag(company.id)" class="button" @click="deleteCompanyName(company.id)">削除</button>
+            <button class="textRight" @click="edit(company.id)"> 
+              {{ getEditFlag(company.id) ? '完了' : '編集' }}
+            </button>
+          </div> 
+          <div>選考状況：<Schedule :isEditing="getEditFlag(company.id)" class="schedule"/></div>
+          <div class="calrendar">
+            <div class="date">選考日付：</div>
+            <Calendar :companyId="company.id" :isEditing="getEditFlag(company.id)" />
+          </div>
         </li>
       </ul>
+  
+      
       <!-- スマホ用のリスト -->
       <ul v-else>
         <li v-for="company in companiesName" :key="company.id" :style="company.completed ? 'text-decoration:line-through;' : ''">
-          <div>企業名：<span><router-link :to="'/company-detail/' + company.id">{{ company.companyName }}</router-link>　</span>
-            <button class="button" @click="deleteCompanyName(company.id)">削除</button>
+          <div>
+            企業名：<span><router-link :to="'/company-detail/' + company.id">{{ company.companyName }}</router-link>　</span>
+            <button v-if="getEditFlag(company.id)" class="button" @click="deleteCompanyName(company.id)">削除</button>
+            <button  class="textRight" @click="edit(company.id)"> 
+              {{ getEditFlag(company.id) ? '完了' : '編集' }}
+            </button>
           </div>
-          <div>選考状況：<Schedule/></div>
-          <div class="calrendar"><div class="date">選考日付：</div><Calendar/></div>
-          
+          <div class="schedule">選考状況：<Schedule :isEditing="getEditFlag(company.id)" class="schedule"/></div>
+           <div class="calrendar">
+            <div class="date">選考日付：</div>
+            <Calendar :companyId="company.id" :isEditing="getEditFlag(company.id)" />
+          </div>
         </li>
       </ul>
     </div>
   </div>
 </template>
+
+
 
 <script>
 export default {
@@ -116,6 +153,15 @@ export default {
 </script>
 
 <style scoped>
+.schedule {
+  display: flex;
+  flex-direction: row; /* Flex items を一行に並べる */
+  white-space: nowrap; /* 改行を防ぐ */
+}
+.textRight {
+  float: right;
+}
+
 .date{
   display: flex;
   padding-top: 7px;
@@ -165,7 +211,7 @@ h1:before {
 
 .companyName ul li,
 .companyName ol li {
-  color: #2d8fdd;
+  color: #03080c;
   border-left: solid 6px #2d8fdd;
   background: #f1f8ff;
   margin-bottom: 3px;
