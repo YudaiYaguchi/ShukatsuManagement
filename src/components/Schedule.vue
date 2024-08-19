@@ -1,7 +1,9 @@
 <script setup>
-import { ref, computed, watch } from 'vue'; // ここでcomputedをインポート
+import { ref, computed, watch, callWithAsyncErrorHandling } from 'vue'; // ここでcomputedをインポート
+import { supabase } from '../supabase';
 
 const props = defineProps({
+  companyId: Number,
   isEditing: Boolean
 });
 
@@ -9,8 +11,11 @@ const props = defineProps({
 // 選択された選考状況
 const selectedStatus = ref('');
 const showSelected = ref(true);
-
-
+const schedule = ref('');
+let index = ref();
+const companiesInfo = ref([]);
+let firstFlag = ref(true);
+let selectedName = ref('');
 
 // 選考状況のオプションリスト
 const optionStatus = ref([
@@ -33,17 +38,59 @@ watch(() => props.isEditing, () =>{
 
 // 選択されたIDを取得
 const selectedId = computed(() => {
+  // selectedStatus.value が空の場合、または optionStatus 内に一致する項目がない場合に対応
   const selected = optionStatus.value.find(status => status.name === selectedStatus.value);
-  return selected ? selected.name : null;
+  if (selected) {
+    selectedName.value = selected.name;
+    console.log(selected.name);
+    firstFlag.value = false;
+    addSchedule();
+    return selected.name;
+  } else {
+    return null;
+  }
 });
+
+
+
+const getCompanyInfo = async () => {
+  let { data, error} = await supabase.from('CompaniesName').select('*');
+  if (error) {
+    console.error("Error fetching company info:", error);
+    return;
+  }
+  companiesInfo.value = data;
+  index.value = companiesInfo.value.findIndex((company) => company.id === props.companyId);
+  schedule.value = companiesInfo.value[index.value].schedule;
+  console.log(schedule.value)
+//  console.log('getCompanyInfo:', companiesInfo.value);
+};
+
+getCompanyInfo();
+
+const addSchedule = async () => {
+  const { data, error } = await supabase
+    .from('CompaniesName') // テーブル名のキャピタライゼーションに注意
+    .update({ schedule: selectedName.value }) // "calendar" フィールドを更新
+    .eq('id', props.companyId)
+    .select('id');
+
+  if (error) {
+    console.error("Error adding schedule:", error);
+    return;
+  }
+  // 取得したデータを正しい方法で更新
+  companiesInfo.value[index.value] = data[0];
+};
+
+
 </script>
 
 <template>
  
 <div class="schedule" v-if="showSelected">
-  <!-- <li v-if="status.name">{{ status.name }}</li>
-  <li v-else>未選択</li> -->
-  <div v-if="selectedId">{{ selectedId }}</div>
+  <div v-if="schedule && firstFlag">{{ schedule }}</div>
+  <div v-else-if="selectedId">{{ selectedId }}</div>
   <div v-else>未選択</div>
   </div>
 <div class="schedule" v-else>
@@ -64,7 +111,5 @@ const selectedId = computed(() => {
   display: flex;
   flex-direction: row; /* Flex items を一行に並べる */
   white-space: nowrap; /* 改行を防ぐ */
-  gap: 10px; /* 要素間の間隔 */
 }
-/* スタイルをここに追加 */
 </style>

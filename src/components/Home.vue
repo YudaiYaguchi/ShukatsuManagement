@@ -32,7 +32,7 @@ getCompanyName();
 const addCompany = async () => {
   if (companyName.value.length !== 0 && companyName.value.trim() !== '') {
     const { data, error } = await supabase.from('CompaniesName').insert([{ companyName: companyName.value }]).select('*');
-    companiesName.value.push(data[0]);
+    companiesName.value.unshift(data[0]);
     editFlag.value.push(false);
     companyName.value = '';
   } else {
@@ -114,7 +114,7 @@ const getEditFlag = (id) => {
               {{ getEditFlag(company.id) ? '完了' : '編集' }}
             </button>
           </div> 
-          <div>選考状況：<Schedule :isEditing="getEditFlag(company.id)" class="schedule"/></div>
+          <div class="schedule">選考状況：<Schedule :companyId="company.id" :isEditing="getEditFlag(company.id)" class="schedule"/></div>
           <div class="calrendar">
             <div class="date">選考日付：</div>
             <Calendar :companyId="company.id" :isEditing="getEditFlag(company.id)" />
@@ -133,7 +133,7 @@ const getEditFlag = (id) => {
               {{ getEditFlag(company.id) ? '完了' : '編集' }}
             </button>
           </div>
-          <div class="schedule">選考状況：<Schedule :isEditing="getEditFlag(company.id)" class="schedule"/></div>
+          <div class="schedule">選考状況：<Schedule :companyId="company.id" :isEditing="getEditFlag(company.id)" /></div>
            <div class="calrendar">
             <div class="date">選考日付：</div>
             <Calendar :companyId="company.id" :isEditing="getEditFlag(company.id)" />
@@ -154,6 +154,7 @@ export default {
 
 <style scoped>
 .schedule {
+  padding-top: 0px;
   display: flex;
   flex-direction: row; /* Flex items を一行に並べる */
   white-space: nowrap; /* 改行を防ぐ */
@@ -164,7 +165,7 @@ export default {
 
 .date{
   display: flex;
-  padding-top: 7px;
+  /* padding-top: 5px; */
 } 
 
 .calrendar{
@@ -214,9 +215,9 @@ h1:before {
   color: #03080c;
   border-left: solid 6px #2d8fdd;
   background: #f1f8ff;
-  margin-bottom: 3px;
-  line-height: 1.5;
-  padding: 0.5em;
+  margin-bottom: 7px;
+  line-height:2.0;
+  padding: 1.0em;
   list-style-type: none!important;
 }
 
