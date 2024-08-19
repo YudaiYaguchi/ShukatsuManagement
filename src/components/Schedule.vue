@@ -33,6 +33,7 @@ const optionStatus = ref([
 
 watch(() => props.isEditing, () =>{
   showSelected.value = !showSelected.value;
+  firstFlag.value = false;
 })
 
 
@@ -40,9 +41,10 @@ watch(() => props.isEditing, () =>{
 const selectedId = computed(() => {
   // selectedStatus.value が空の場合、または optionStatus 内に一致する項目がない場合に対応
   const selected = optionStatus.value.find(status => status.name === selectedStatus.value);
+  console.log('selectedName:',selectedName.value)
   if (selected) {
     selectedName.value = selected.name;
-    console.log(selected.name);
+    // console.log(selected.name);
     firstFlag.value = false;
     addSchedule();
     return selected.name;
@@ -74,7 +76,7 @@ const addSchedule = async () => {
     .update({ schedule: selectedName.value }) // "calendar" フィールドを更新
     .eq('id', props.companyId)
     .select('id');
-
+  
   if (error) {
     console.error("Error adding schedule:", error);
     return;

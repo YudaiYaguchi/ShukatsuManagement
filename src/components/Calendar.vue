@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, ReactiveEffect } from 'vue';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import { supabase } from '../supabase';
@@ -11,6 +11,7 @@ const props = defineProps({
 });
 
 
+let currentFlag = true;
 let index = ref(-1);
 const companiesInfo = ref([]);
 const date = ref(new Date());
@@ -18,6 +19,7 @@ const showDate = ref(true);
 const firstFlag = ref(true);
 const defaultText = ref('未選択');
 const calendar = ref(''); 
+let currentDate = ref('');
 let dateText = computed(() => date.value.toLocaleString('ja-JP', {
   year: 'numeric',
   month: '2-digit',
@@ -30,9 +32,15 @@ let dateText = computed(() => date.value.toLocaleString('ja-JP', {
 // 編集状態が変更されたときに表示を切り替える
 watch(() => props.isEditing, () => {
     showDate.value = !showDate.value;
-    calendar.value = null;
-    firstFlag.value = false;
+    //calendar.value = null;
+    if(currentFlag){//編集ボタンが押された時に現在時刻を保存
+    currentDate.value = dateText.value;
+    currentFlag = false;
+    }else{//完了ボタンが押され時の処理
     addCalendar();
+    currentFlag = true;
+    }
+
   });
 
 const getCompanyInfo = async () => {
@@ -53,12 +61,19 @@ const getCompanyInfo = async () => {
 getCompanyInfo();
 
 const addCalendar = async () => {
+  // console.log('currentDate:',currentDate.value);
+  // console.log('dateText:',dateText.value) 
+  if(currentDate.value != dateText.value){
   const { data, error } = await supabase.from('CompaniesName').update([{ calendar: dateText.value }]).eq('id', props.companyId).select('id');
+  companiesInfo.value.unshift(data[0]);
+  calendar.value = dateText.value;
+  firstFlag.value = false;
+
   if (error) {
     console.error("Error adding calendar:", error);
     return;
   }
-  companiesInfo.value.unshift(data[0]);
+  }
 };
 </script>
 
