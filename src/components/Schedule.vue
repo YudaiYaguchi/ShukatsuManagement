@@ -20,15 +20,16 @@ let selectedName = ref('');
 // 選考状況のオプションリスト
 const optionStatus = ref([
   { id: 1, name: '説明会' }, 
-  { id: 2, name: 'ES (エントリーシート)' }, 
-  { id: 3, name: 'webテスト(適性検査)' }, 
-  { id: 4, name: '一次面接'},
-  { id: 5, name: '二次面接'},
-  { id: 6, name: '三次面接'},
-  { id: 7, name: '四次面接'},
-  { id: 8, name: '最終面接'},
-  { id: 9, name: '内々定'},
-  { id: 10, name: '内定'}
+  { id: 2, name: '面談'},
+  { id: 3, name: 'ES (エントリーシート)' }, 
+  { id: 4, name: 'webテスト(適性検査)' }, 
+  { id: 5, name: '一次面接'},
+  { id: 6, name: '二次面接'},
+  { id: 7, name: '三次面接'},
+  { id: 8, name: '四次面接'},
+  { id: 9, name: '最終面接'},
+  { id: 10, name: '内々定'},
+  { id: 11, name: '内定'}
 ]);
 
 watch(() => props.isEditing, () =>{
@@ -46,10 +47,11 @@ const selectedId = computed(() => {
     selectedName.value = selected.name;
     // console.log(selected.name);
     firstFlag.value = false;
+    schedule.value = selected.name;
     addSchedule();
     return selected.name;
   } else {
-    return null;
+    return schedule.value;
   }
 });
 
@@ -92,7 +94,7 @@ const addSchedule = async () => {
  
 <div class="schedule" v-if="showSelected">
   <div v-if="schedule && firstFlag">{{ schedule }}</div>
-  <div v-else-if="selectedId">{{ selectedId }}</div>
+  <div v-else-if="selectedId">{{ schedule }}</div>
   <div v-else>未選択</div>
   </div>
 <div class="schedule" v-else>
