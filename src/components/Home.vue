@@ -95,6 +95,7 @@ const getEditFlag = (id) => {
     <Search/>
     <div class="companyName">
       <div>
+        <b>
         <table>
           <tr>
             <td>企業名</td>
@@ -102,6 +103,7 @@ const getEditFlag = (id) => {
             <td>選考日付</td>
           </tr>
         </table>
+      </b>
       </div>
 
       <!-- PC用のリスト -->
@@ -153,32 +155,47 @@ export default {
 </script>
 
 <style scoped>
+
 .schedule {
   padding-top: 0px;
   display: flex;
   flex-direction: row; /* Flex items を一行に並べる */
   white-space: nowrap; /* 改行を防ぐ */
 }
+
 .textRight {
   float: right;
 }
 
-.date{
+.date {
   display: flex;
-  /* padding-top: 5px; */
 } 
 
-.calrendar{
+.calrendar {
   display: flex;
 }
+
 .button {
-  color: black;
+  color: #007bff; /* 青色のボタン */
+  background: none;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #007bff; /* ホバー時に背景色を青に */
+  color: #fff; /* ホバー時に文字色を白に */
 }
 
 .head {
-  background: #f0f2fd;
+  background: #fff; /* ヘッダーの背景を白に */
   width: 100%;
-  padding: 0.1%;
+  padding: 0.5em;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 軽いシャドウを追加 */
+  border-bottom: 2px solid #e0e0e0; /* 薄いグレーのボーダーを追加 */
 }
 
 h1 {
@@ -190,6 +207,7 @@ h1 {
   margin: 1.5em 0;
 }
 
+
 h1:before {
   content: "";
   position: absolute;
@@ -198,7 +216,7 @@ h1:before {
   width: 40%;
   height: 100%;
   border-radius: 50%;
-  border: 5px solid #f70707;
+  border: 5px solid #1915ee;
   border-left-color: transparent;
   border-right-color: transparent;
   transform: translateX(-50%);
@@ -212,13 +230,15 @@ h1:before {
 
 .companyName ul li,
 .companyName ol li {
-  color: #03080c;
-  border-left: solid 6px #2d8fdd;
-  background: #f1f8ff;
+  color: #333; /* リスト項目の文字色を濃いグレーに */
+  border-left: solid 6px #007bff; /* 左側のボーダーを青色に */
+  background: #fff; /* 背景色を白に */
   margin-bottom: 7px;
-  line-height:2.0;
+  line-height: 2.0;
   padding: 1.0em;
   list-style-type: none!important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); /* 軽いシャドウを追加 */
+  border-radius: 15px; /* 角を少し丸める */
 }
 
 .companyName table {
@@ -228,12 +248,44 @@ h1:before {
 
 .companyName td {
   text-align: center;
-  padding: 1px;
+  padding: 8px;
 }
 
 .companyName td:first-child,
 .companyName td:nth-child(2),
 .companyName td:last-child {
   width: 33.33%;
+  color: #333; /* 文字色を濃いグレーに */
+}
+
+input[type="text"] {
+  padding: 10px;
+  width: 60%;
+  border: 1px solid #ccc; /* 薄いグレーのボーダー */
+  border-radius: 4px; /* 角を丸くする */
+  margin-right: 10px;
+}
+
+button[type="submit"] {
+  padding: 4px 20px;
+  background-color: #007bff; /* 青色のボタン */
+  color: #fff; /* ボタンの文字色を白に */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #0056b3; /* ホバー時に色を濃くする */
+}
+
+form div {
+  margin-bottom: 20px; /* フォーム内の要素に余白を追加 */
+}
+
+p {
+  font-size: 16px;
+  color: #333; /* 文字色は濃いグレー */
 }
 </style>
