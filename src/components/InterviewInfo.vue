@@ -1,7 +1,6 @@
 <script setup>
 import { ref, computed, watch, callWithAsyncErrorHandling } from 'vue'; // ここでcomputedをインポート
 import { supabase } from '../supabase';
-import StarRating from 'vue-star-rating';
 
 const props = defineProps({
   id: Number,
@@ -19,7 +18,17 @@ const companiesInfo = ref([]);
 let firstFlag = ref(true);
 let selectedName = ref('');
 let editFlag = ref(false);
+let content = ref('');
+let evaluation = ref('')
+let reflection = ref('')
+let rate = ref(0);
 
+
+const textInfo = ref([
+  {id: 1, text: null, message: '面接で聞かれた内容を入力してください。'},
+  {id: 2, text: null, message: '面接での自己評価を入力してください。'},
+  {id: 3, text: null, message: '面接での反省点を入力してください。'},
+]);
 
 // 選考状況のオプションリスト
 const optionStatus = ref([
@@ -27,6 +36,11 @@ const optionStatus = ref([
   { id: 2, name: '不合格'}, 
 ]);
 
+
+// 変化を監視してコンソールに出力
+watch(rate, () => {
+  addRate();
+});
 
 
 // 選択されたIDを取得
@@ -59,7 +73,12 @@ const getCompanyInfo = async () => {
   index.value = companiesInfo.value.findIndex((company) => company.id == props.id);
   console.log('index:',index.value ,'props.id:',props.id)
   interview.value = companiesInfo.value[index.value].interview;
-  console.log(interview.value)
+  content.value = companiesInfo.value[index.value].content;
+  evaluation.value = companiesInfo.value[index.value].evaluation;
+  reflection.value = companiesInfo.value[index.value].reflection;
+  rate.value = companiesInfo.value[index.value].rate;
+  // console.log(interview.value)
+  // console.log('CompaniesInfo:',companiesInfo.value[index.value].content);
   // console.log('getCompanyInfo:', companiesInfo.value);
   // console.table(companiesInfo.value)
 };
@@ -89,35 +108,101 @@ const edit = () => {
   addInterview();
 }
 
+const addContent = async (event) => {
+  event.preventDefault();
+  const { data, error } = await supabase
+    .from('CompaniesName')
+    .update({ content: content.value })
+    .eq('id', props.id)
+    .select('*');
+
+  if (error) {
+    console.error('Error updating company ES:', error);
+  } else {
+    console.log('Updated record:', data);
+  }
+  console.log('rate:',rate.value)
+  companiesInfo.value[index.value] = data[0];
+};
+
+
+const addEvaluation = async (event) => {
+  event.preventDefault();
+  const { data, error } = await supabase
+    .from('CompaniesName')
+    .update({ evaluation: evaluation.value })
+    .eq('id', props.id)
+    .select('*');
+
+  if (error) {
+    console.error('Error updating company ES:', error);
+  } else {
+    console.log('Updated record:', data);
+  }
+
+  companiesInfo.value[index.value] = data[0];
+};
+
+
+const addReflection = async (event) => {
+  event.preventDefault();
+  const { data, error } = await supabase
+    .from('CompaniesName')
+    .update({ reflection: reflection.value })
+    .eq('id', props.id)
+    .select('*');
+
+  if (error) {
+    console.error('Error updating company ES:', error);
+  } else {
+    // console.log('Updated record:', data);
+  }
+  companiesInfo.value[index.value] = data[0];
+};
+
+const addRate = async (event) => {
+
+  const { data, error } = await supabase
+    .from('CompaniesName')
+    .update({ rate: rate.value })
+    .eq('id', props.id)
+    .select('*');
+
+  if (error) {
+    console.error('Error updating company ES:', error);
+  } else {
+    // console.log('Updated record:', data);
+  }
+  companiesInfo.value[index.value] = data[0];
+};
 </script>
 
 <template>
   
-<div class="form-container">
-   
+  <div class="form-container">
     <div class="rating-container">
-    <h3>面接自己評価：</h3>
-    <star-rating
-      v-model="rate"
-      :increment="0.5"
-      :max-rating="5"
-      inactive-color="#000"
-      active-color="rgb(211, 247, 10)"
-      :star-size="30"
-      :show-rating="true"
-      :rating="rating"
-    ></star-rating>
-    <input type="hidden" name="score" :value="rating" />
- 
-  </div>
+      <h3>面接自己評価：</h3>
+      <div class="stars" >
+      <span 
+        v-for="n in 5" 
+        :key="n" 
+        @click="rate = n"
+        :style="{ color: n <= rate ? 'gold' : 'gray', cursor: 'pointer',fontSize: '25px' }"
+      >
+        ★
+      </span>
+    </div>
+    <input type="hidden" name="score" :value="rate" />
+    {{ rate }}
+    </div>  
 
 
 <div class="interview" v-if="showSelected">
   選考結果：
   <div v-if="interview && firstFlag">{{ interview }}</div>
   <div v-else-if="selectedId">{{ interview }}</div>
-  <div v-else>未選択</div>
-  <button class="textRight" @click="edit" style="float: right;">{{ editFlag ? '完了' : '編集' }}</button>
+  <div v-else style="padding-right: 10px;">未選択</div>
+  <button class="textRight" @click="edit" >{{ editFlag ? '完了' : '編集' }}</button>
   </div>
 <div class="interview" v-else>
   選考結果：
@@ -135,24 +220,48 @@ const edit = () => {
 
 
 
-    <form>
-      <div class="form-group">
-        <label for="interviewContent">面接内容</label>
-        <textarea id="interviewContent" v-model="interviewContent" class="input-box"></textarea>
-      </div>
+<form>
+  <label for="interviewContent">面接内容</label>
+    <div class="form-group" v-if="companiesInfo.content != null">
+      <textarea 
+        @input="addContent" 
+        id="interviewContent" 
+        v-model="content" 
+        :placeholder="textInfo[0].message"
+        class="input-box">
+      </textarea>
+    </div>
+    <div v-else>
+      <textarea 
+        @input="addContent" 
+        id="interviewContent" 
+        v-model="content"  
+        :placeholder="textInfo[0].message"
+        class="input-box">
+      </textarea>
+    </div>
 
-      <div class="form-group">
+
+
+      <div class="form-group" v-if="companiesInfo.evaluation">
         <label for="selfEvaluation">面接自己評価</label>
-        <textarea id="selfEvaluation" v-model="selfEvaluation" class="input-box"></textarea>
+        <textarea @input="addEvaluation" :placeholder="textInfo[1].message" id="selfEvaluation" v-model="evaluation" class="input-box"></textarea>
+      </div>
+      <div v-else>
+        <label for="selfEvaluation">面接自己評価</label>
+        <textarea @input="addEvaluation" :placeholder="textInfo[1].message" id="selfEvaluation" v-model="evaluation" class="input-box"></textarea>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" v-if="companiesInfo.reflection">
         <label for="reflection">反省点</label>
-        <textarea id="reflection" v-model="reflection" class="input-box"></textarea>
+        <textarea @input="addReflection" :placeholder="textInfo[2].message" id="reflection"  v-model="reflection" class="input-box"></textarea>
+      </div>
+      <div v-else>
+        <label for="reflection">反省点</label>
+        <textarea @input="addReflection" :placeholder="textInfo[2].message" id="reflection"  v-model="reflection" class="input-box"></textarea>
       </div>
     </form>
   </div>
-
 </template>
 
 <style scoped>

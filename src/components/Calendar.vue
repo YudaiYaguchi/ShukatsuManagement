@@ -52,7 +52,7 @@ const getCompanyInfo = async () => {
   companiesInfo.value = data;
   index.value = companiesInfo.value.findIndex((company) => company.id === props.companyId);
   calendar.value = companiesInfo.value[index.value].calendar;
-  console.log(calendar.value)
+  // console.log(calendar.value)
 //  console.log('getCompanyInfo:', companiesInfo.value);
 };
 

@@ -22,12 +22,23 @@ provide("editId", editId);
 
 const getCompanyName = async () => {
   let { data, error, status } = await supabase.from('CompaniesName').select('*');
-  console.log(data);
+  console.log("all data:",data);
+  data.sort((a, b) => a.order - b.order);
   editFlag.value = data.map(() => false);
   companiesName.value = data;
+
 };
 
 getCompanyName();
+
+
+
+
+// 子コンポーネントからのデータを受け取ってcompaniesNameを更新
+const updateCompaniesName = (newData) => {
+  companiesName.value = newData;
+};
+
 
 const addCompany = async () => {
   if (companyName.value.length !== 0 && companyName.value.trim() !== '') {
