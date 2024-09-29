@@ -7,14 +7,14 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node src/router/index.js"
+    "start": "vite"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
     "@vuepic/vue-datepicker": "^9.0.2",
     "axios": "^1.7.5",
     "cors": "^2.8.5",
-    "express": "^4.19.2",
+    "express": "^4.21.0",
     "sqlite3": "^5.1.7",
     "vue": "^3.4.29",
     "vue-burger-menu": "^2.0.5",
