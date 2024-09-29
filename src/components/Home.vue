@@ -13,8 +13,11 @@ const props = defineProps(['userName','userId']);
 const router = useRouter();
 const userId = props.userId;
 const userName = props.userName;
+const loginStatus = ref(false);
 provide('userId', userId);
 provide('userName', userName);
+
+
 
 let id = 0;
 const companiesName = ref([]);
@@ -31,7 +34,7 @@ let editId = ref(-1);
 provide("editId", editId);
 
 const getCompanyName = async () => {
-  let { data, error, status } = await supabase.from('CompaniesName').select('*');
+  let { data, error, status } = await supabase.from('CompaniesName').select('*').eq('userId', props.userId);
   console.log("all data:",data);
   data.sort((a, b) => a.order - b.order);
   editFlag.value = data.map(() => false);
@@ -39,9 +42,40 @@ const getCompanyName = async () => {
 
 };
 
-getCompanyName();
+const getUser = async () =>{
+  let { data, error, status } = await supabase
+    .from('Users')
+    .select('*')
+    .eq('id',props.userId)
+
+  loginStatus.value = data[0].login;
+  console.log("loginStatus:",loginStatus.value);
+  console.log("data[0].login",data[0].login);
+  if (data[0].login) {
+    getCompanyName();  // userが存在し、loginがtrueなら実行
+  }
+}
 
 
+
+onMounted(async () => {
+  await getUser();  // ユーザー情報の取得を待つ
+});
+
+
+//getCompanyName();
+
+// ページがリロードされたときにログアウトにする
+window.addEventListener('beforeunload', (event) => {
+  logoutUser();
+});
+
+const logoutUser = async () => {
+  const { data, error } = await supabase
+    .from('Users')
+    .update({ login: false })
+    .eq('id', props.userId);
+};
 
 
 // 子コンポーネントからのデータを受け取ってcompaniesNameを更新
@@ -52,7 +86,12 @@ const updateCompaniesName = (newData) => {
 
 const addCompany = async () => {
   if (companyName.value.length !== 0 && companyName.value.trim() !== '') {
-    const { data, error } = await supabase.from('CompaniesName').insert([{ companyName: companyName.value }]).select('*');
+    const { data, error } = await supabase
+    .from('CompaniesName')
+    .insert([{ companyName: companyName.value,
+                userId: props.userId}])
+    .select('*');
+
     companiesName.value.unshift(data[0]);
     editFlag.value.push(false);
     companyName.value = '';
@@ -100,25 +139,10 @@ const getEditFlag = (id) => {
   const index = companiesName.value.findIndex((company) => company.id === id);
   return editFlag.value[index];
 };
-
-const screenTransition = (id) =>{
-            console.log("screenTransition")
-            console.log("userId:", props.userId);
-            console.log("userName:", props.userName);
-            console.log("id:", id);
-  router.push({ 
-          name: 'CompanyDetail', 
-          params: { 
-            userId: props.userId,
-            userName: props.userName, 
-            id: id,
-          } 
-        });
-    
-}
 </script>
 
 <template>
+<div v-if="loginStatus">  
   <Menu :userId = "props.userId" :userName = "props.userName"/>
   <div class="head">
     <h1>就活管理</h1>
@@ -181,6 +205,19 @@ const screenTransition = (id) =>{
       </ul>
     </div>
   </div>
+</div>
+<div v-else-if="!loginStatus" class="logout-container">
+  <h1>ログアウト</h1>
+  <p>正常にログアウトしました。</p>
+  <p>
+    <span>
+      <a href="/" class="back-link">ログイン画面に戻る</a>
+    </span>
+  </p>
+</div>
+<div v-else>
+  <p>Loading</p>
+</div>
 </template>
 
 
@@ -192,6 +229,45 @@ export default {
 </script>
 
 <style scoped>
+.logout-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+p {
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.back-link {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+}
 
 .schedule {
   padding-top: 0px;

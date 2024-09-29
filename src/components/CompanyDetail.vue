@@ -95,7 +95,7 @@ const getCompanyInfo = async (id) => {
     .update({ updated_at : currentDate }) 
     .eq('id', id)
     .select('*');
-  let { data: allData } = await supabase.from('CompaniesName').select('*');
+  let { data: allData } = await supabase.from('CompaniesName').select('*').eq('userId',props.userId);
     
   
   console.log('All Data:',allData);

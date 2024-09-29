@@ -143,10 +143,4 @@ font-size: 18px;
 	background: rgba(3,3,3,.5);
 	display: block;
 }
-/* PCではハンバーガーメニューを表示しない */
-@media (min-width: 992px){
-	.hamburger-demo-menubox{
-		display: none;
-	}
-}
 </style>

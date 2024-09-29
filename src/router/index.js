@@ -31,7 +31,7 @@ const routes = [
     props: true
   },
   {
-    path: '/login',
+    path: '/',
     name: 'Login' ,
     component: Login,
     props: true

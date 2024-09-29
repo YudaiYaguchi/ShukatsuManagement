@@ -23,6 +23,37 @@ const getUsers = async () => {
 
 getUsers();
 
+const createUser = async (userName,userPassword) => {
+  const { data, error } = await supabase
+        .from('Users')
+        .insert([{ 
+          name: userName, 
+          password: userPassword,
+          login: true
+        }])
+
+}
+
+const findUser = async () =>{
+  let { data, error, status } = await supabase
+    .from('Users')
+    .select('*')
+    .eq('name', userName.value)        // userName に一致するユーザー
+    .eq('password', userPassword.value); // userPassword に一致するユーザー
+  
+    return data;
+}
+
+const updateUser = async () => {
+  console.log("userId.value:",userId.value);
+  const { data, error } = await supabase
+    .from('Users')
+    .update({ login: true })
+    .eq('id', userId.value)
+    .select('*');
+
+};
+
 
 const  doLogin = async () => {
     console.log("Username:", userName.value);
@@ -33,12 +64,13 @@ const  doLogin = async () => {
       if(users.value[i].password === userPassword.value && users.value[i].name === userName.value){
         //  alert("ログイン\nUsername：" + userName.value + "\nPassword："+ userPassword.value);
          existingUserFlag.value = true;
-         userId.value = users.value[i].id
-         
+         userId.value = Number(users.value[i].id);
+         updateUser();
+
          router.push({ 
           name: 'Home', 
           params: { 
-            userId: userId.value, 
+            userId: Number(userId.value), 
             userName: users.value[i].name 
           } 
         });
@@ -46,21 +78,23 @@ const  doLogin = async () => {
       }
     }
 
-    if(userName.value.length === 0 && userPassword.value.length === 0){
+    if(userName.value.length === 0 || userPassword.value.length === 0){
         alert("UsernameまたはPasswordが入力されていません。");
     }else if(!existingUserFlag.value){
-        const { data, error } = await supabase
-        .from('Users')
-        .insert([{ 
-          name: userName.value, 
-          password: userPassword.value 
-        }])
-        users.value = data;
-        router.push({ name: 'Home' });
-    }else {
-
-    }
+        alert("新規ユーザーが作成されました。");
     
+        createUser(userName.value,userPassword.value);
+        const newUser = await findUser();
+
+        console.log("newUser:",newUser);
+        router.push({ 
+          name: 'Home', 
+          params: { 
+            userId: Number(newUser[0].id), 
+            userName: newUser[0].name 
+          } 
+        });
+    }
     
     
 
