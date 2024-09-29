@@ -1,5 +1,11 @@
 <script setup>
-import { inject, ref, watch } from 'vue';
+import { inject, ref, watch ,defineProps } from 'vue';
+
+// props を使って親コンポーネントから渡された情報を受け取る
+const props = defineProps({
+  userId: Number,
+  userName: String
+});
 
 const keyword = ref('');
 const companiesName = inject("companiesName");
@@ -27,7 +33,7 @@ watch(keyword, searchFunc, { immediate: true });
   <div>
     <table>
       <tr v-for="company in hitCompaniesName" :key="company.id">
-        <td><router-link :to="'/company-detail/' + company.id">{{ company.companyName }}</router-link></td>
+        <td><router-link :to="'/company-detail/' + props.userName + '/'+ props.userId +'/'+ company.id">{{ company.companyName }}</router-link></td>
       </tr>
     </table>
   </div>

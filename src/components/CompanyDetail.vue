@@ -1,18 +1,34 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted ,defineProps,provide} from 'vue';
 import { useRoute } from 'vue-router';
 import { supabase } from '../supabase';
 import Menu from './Menu.vue'
 import InterviewInfo from './InterviewInfo.vue';
 
 
-// Propsの定義
+// // Propsの定義
+// const props = defineProps({
+//   id: String,
+// });
+
 const props = defineProps({
-  id: String,
+  userName: String,
+  userId: Number, // userIdも数値か文字列で受け取れるようにする
+  id: Number, // idは数値でも文字列でもOKにする
+  
+});
+
+onMounted(() => {
+  console.log("Company ID:", props.id);
+  console.log("User Name:", props.userName);
+  console.log("User ID:", props.userId);
 });
 
 // Vue Routerからのルートパラメータ取得
 const route = useRoute();
+const userId = props.userId
+provide('userId', userId);
+provide('userName', props.userName);
 
 // 変数の初期化
 const companyInfo = ref({});
@@ -191,7 +207,7 @@ const setRating = (newRating) => {
   
   <Menu/>
   <div v-if="companyInfo">
-    <h1><router-link :to="'/'" class="custom-link">{{ companyInfo.companyName }}</router-link></h1>
+    <h1><router-link :to="'/' + props.userName + '/' + props.userId" class="custom-link">{{ companyInfo.companyName }}</router-link></h1>
     <form @submit="addCompanyURL">
       <div>
         <input v-model="company" placeholder="企業のマイページ等を登録"/><button type="submit">URLを登録</button>
