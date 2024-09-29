@@ -1,4 +1,19 @@
+<script setup>
+import { onMounted,inject ,defineProps} from 'vue';
 
+const props = defineProps({
+  userId: Number,
+  userName: String
+});
+
+const userId = inject('userId');
+const userName = inject('userName');
+
+// 受け取ったデータをconsole.logで表示
+console.log("User ID:", userId);
+console.log("User Name:", userName);
+
+</script>
 
 <template>
   <div class="hamburger-demo-menubox">
@@ -8,10 +23,11 @@
 		</label>
 		<div class="hamburger-demo-menuwrap">
 			<ul class="hamburger-demo-menulist">
-                <li><a href="#">HOME</a></li>
-				<li><a href="#">選考状況</a></li>
-				<li><a href="#">予定管理</a></li>
-                <li><a href="#">ESまとめ</a></li> 
+				<li><router-link :to="'/' + userName + '/' + userId">HOME</router-link></li>
+				<li><router-link :to="'/' + userName + '/' + userId">選考状況</router-link></li>
+				<li><router-link :to="'/' + userName + '/' + userId">予定管理</router-link></li>
+				<li><router-link :to="'/' + userName + '/' + userId">ESまとめ</router-link></li>
+				<li><router-link :to="'/' + userName + '/' + userId">上記の機能は近日中に追加予定</router-link></li>
 			</ul>
 		</div>
 		<div class="hamburger-demo-cover"></div>

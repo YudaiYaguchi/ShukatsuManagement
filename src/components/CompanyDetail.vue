@@ -1,18 +1,34 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted ,defineProps,provide} from 'vue';
 import { useRoute } from 'vue-router';
 import { supabase } from '../supabase';
 import Menu from './Menu.vue'
 import InterviewInfo from './InterviewInfo.vue';
-import StarRating from 'vue-star-rating';
 
-// Propsの定義
+
+// // Propsの定義
+// const props = defineProps({
+//   id: String,
+// });
+
 const props = defineProps({
-  id: String,
+  userName: String,
+  userId: Number, // userIdも数値か文字列で受け取れるようにする
+  id: Number, // idは数値でも文字列でもOKにする
+  
+});
+
+onMounted(() => {
+  console.log("Company ID:", props.id);
+  console.log("User Name:", props.userName);
+  console.log("User ID:", props.userId);
 });
 
 // Vue Routerからのルートパラメータ取得
 const route = useRoute();
+const userId = props.userId
+provide('userId', userId);
+provide('userName', props.userName);
 
 // 変数の初期化
 const companyInfo = ref({});
@@ -23,6 +39,42 @@ const clickCompanyFlag = ref(true);
 const clickInterviewFlag = ref(false);
 const rating = ref(0); // 初期評価
 let rate = ref(0);
+let allData ={};
+
+
+const update = async (update_data) => {
+  // まず、配列の順番に基づいて order を設定
+  update_data.forEach((record, index) => {
+    record.order = index + 1; // 1から始まる順番を設定
+  });
+
+  // 各レコードの order を更新
+  for (const record of update_data) {
+    const { data, error } = await supabase
+      .from('CompaniesName')
+      .update({ order: record.order }) // order フィールドを更新
+      .eq('id', record.id)
+      .select('*');
+
+    if (error) {
+      console.error('Error updating order:', error.message, 'Record:', record);
+    } else {
+      // console.log('Updated Record Order:', data);
+    }
+  }
+
+  // order フィールドでレコードを取得してソート
+  const { data: sortedData, error: sortError } = await supabase
+    .from('CompaniesName')
+    .select('*')
+    .order('order', { ascending: true }); // order フィールドで昇順にソート
+
+  if (sortError) {
+    console.error('Error retrieving sorted data:', sortError.message);
+  } else {
+    // console.log('Sorted Data:', sortedData);
+  }
+};
 
 // 特定の企業情報を取得する関数
 const getCompanyInfo = async (id) => {
@@ -34,7 +86,30 @@ const getCompanyInfo = async (id) => {
   if (!error) {
     companyInfo.value = data || {};  // データがnullの場合は空オブジェクトを設定
   }
+  
+  const currentDate = new Date().toISOString();
+  console.log(currentDate); 
+
+  const { data_update_at } = await supabase
+    .from('CompaniesName') // テーブル名のキャピタライゼーションに注意
+    .update({ updated_at : currentDate }) 
+    .eq('id', id)
+    .select('*');
+  let { data: allData } = await supabase.from('CompaniesName').select('*');
+    
+  
+  console.log('All Data:',allData);
+  allData.sort((a, b) => {
+    // Dateオブジェクトに変換し、getTimeでミリ秒に変換
+    return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+});
+
+    console.log('Sort All Data:',allData);
+
+   update(allData);
+ 
 };
+
 
 // コンポーネントがマウントされたときに企業情報を取得
 onMounted(() => {
@@ -132,7 +207,7 @@ const setRating = (newRating) => {
   
   <Menu/>
   <div v-if="companyInfo">
-    <h1><router-link :to="'/'" class="custom-link">{{ companyInfo.companyName }}</router-link></h1>
+    <h1><router-link :to="'/' + props.userName + '/' + props.userId" class="custom-link">{{ companyInfo.companyName }}</router-link></h1>
     <form @submit="addCompanyURL">
       <div>
         <input v-model="company" placeholder="企業のマイページ等を登録"/><button type="submit">URLを登録</button>
@@ -164,7 +239,7 @@ const setRating = (newRating) => {
   
 <div v-if="clickInterviewFlag " key="interview">
   <div>
-  <InterviewInfo :id = "props.id"/>
+  <InterviewInfo :id = "Number(props.id)"/>
   </div>
 </div>  
 <div class="form-container">

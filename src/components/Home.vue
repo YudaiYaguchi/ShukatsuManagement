@@ -1,10 +1,20 @@
 <script setup>
-import { ref, onMounted, onUnmounted, provide } from 'vue';
+import { ref, onMounted, onUnmounted, provide,defineProps } from 'vue';
+import { useRouter } from 'vue-router';
 import { supabase } from '../supabase';
 import Search from './Search.vue';
 import Menu from './Menu.vue';
 import Schedule from './Schedule.vue';
 import Calendar from './Calendar.vue';
+
+// propsを定義
+const props = defineProps(['userName','userId']);
+
+const router = useRouter();
+const userId = props.userId;
+const userName = props.userName;
+provide('userId', userId);
+provide('userName', userName);
 
 let id = 0;
 const companiesName = ref([]);
@@ -22,12 +32,23 @@ provide("editId", editId);
 
 const getCompanyName = async () => {
   let { data, error, status } = await supabase.from('CompaniesName').select('*');
-  console.log(data);
+  console.log("all data:",data);
+  data.sort((a, b) => a.order - b.order);
   editFlag.value = data.map(() => false);
   companiesName.value = data;
+
 };
 
 getCompanyName();
+
+
+
+
+// 子コンポーネントからのデータを受け取ってcompaniesNameを更新
+const updateCompaniesName = (newData) => {
+  companiesName.value = newData;
+};
+
 
 const addCompany = async () => {
   if (companyName.value.length !== 0 && companyName.value.trim() !== '') {
@@ -79,20 +100,36 @@ const getEditFlag = (id) => {
   const index = companiesName.value.findIndex((company) => company.id === id);
   return editFlag.value[index];
 };
+
+const screenTransition = (id) =>{
+            console.log("screenTransition")
+            console.log("userId:", props.userId);
+            console.log("userName:", props.userName);
+            console.log("id:", id);
+  router.push({ 
+          name: 'CompanyDetail', 
+          params: { 
+            userId: props.userId,
+            userName: props.userName, 
+            id: id,
+          } 
+        });
+    
+}
 </script>
 
 <template>
-  <Menu/>
+  <Menu :userId = "props.userId" :userName = "props.userName"/>
   <div class="head">
     <h1>就活管理</h1>
-    <p>ログインユーザー：○○さん</p>
+    <p>ログインユーザー：{{props.userName}}</p>
     <form @submit.prevent="addCompany">
       <div>
         <input v-model="companyName" placeholder="企業の名前を入力" /> 
         <button type="submit">企業を登録</button>
       </div> 
     </form>
-    <Search/>
+    <Search :userId="props.userId" :userName="props.userName"/>
     <div class="companyName">
       <div>
         <b>
@@ -110,7 +147,7 @@ const getEditFlag = (id) => {
       <ul v-if="!isMobile">
         <li v-for="company in companiesName" :key="company.id" :style="company.completed ? 'text-decoration:line-through;' : ''">
           <div>
-            企業名：<span><router-link :to="'/company-detail/' + company.id">{{ company.companyName }}</router-link>　</span>
+            企業名：<span><router-link :to="'/company-detail/' + props.userName + '/' + Number(props.userId)   + '/' + company.id">{{ company.companyName }}</router-link>　</span>
             <button v-if="getEditFlag(company.id)" class="button" @click="deleteCompanyName(company.id)">削除</button>
             <button class="textRight" @click="edit(company.id)"> 
               {{ getEditFlag(company.id) ? '完了' : '編集' }}
@@ -129,7 +166,7 @@ const getEditFlag = (id) => {
       <ul v-else>
         <li v-for="company in companiesName" :key="company.id" :style="company.completed ? 'text-decoration:line-through;' : ''">
           <div>
-            企業名：<span><router-link :to="'/company-detail/' + company.id">{{ company.companyName }}</router-link>　</span>
+            企業名：<span><router-link :to="'/company-detail/' + props.userName + '/' + Number(props.userId)   + '/' + company.id">{{ company.companyName }}</router-link>　</span>
             <button v-if="getEditFlag(company.id)" class="button" @click="deleteCompanyName(company.id)">削除</button>
             <button  class="textRight" @click="edit(company.id)"> 
               {{ getEditFlag(company.id) ? '完了' : '編集' }}
