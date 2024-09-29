@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "postinstall": "npm run build",
-    "start": "node vite.config.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
