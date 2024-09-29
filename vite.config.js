@@ -19,3 +19,18 @@ export default defineConfig({
     }
   }
 })
+module.exports = {
+  publicPath: "./",
+  "pages": {
+    "index": {
+      "entry": "src/main.js",
+      "title": "Brain Juice"
+    }
+  },
+  "configureWebpack": {
+    "devtool": "source-map",
+  },
+  "transpileDependencies": [
+    "vuetify"
+  ],
+}
