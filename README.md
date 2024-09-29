@@ -27,3 +27,9 @@ npm run dev
 ```sh
 npm run build
 ```
+
+### デプロイ方法
+
+```sh
+git push heroku master
+```
