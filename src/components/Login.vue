@@ -106,8 +106,9 @@ const  doLogin = async () => {
 
 </script>
 <template>
-    <h1>就活管理</h1>
+  <div class="login-wrapper"> 
     <div class="container">
+      <h1>就活管理</h1> <!-- h1をcontainer内に移動 -->
       <form @submit.prevent="doLogin">
         <p class="fsize">ログイン画面</p>
         <input type="text" placeholder="Username" v-model="userName">
@@ -115,18 +116,11 @@ const  doLogin = async () => {
         <button type="submit">ログイン</button>
       </form>
     </div>
-  </template>
-
+  </div>
+</template>
 
 <style scoped>
-.head {
-  background: #fff; /* ヘッダーの背景を白に */
-  width: 100%;
-  padding: 0.5em;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 軽いシャドウを追加 */
-  border-bottom: 2px solid #e0e0e0; /* 薄いグレーのボーダーを追加 */
-}
-
+/* h1のスタイルをそのまま維持 */
 h1 {
   position: relative;
   color: #150063;
@@ -135,7 +129,6 @@ h1 {
   text-align: center;
   margin: 1.5em 0;
 }
-
 
 h1:before {
   content: "";
@@ -151,48 +144,76 @@ h1:before {
   transform: translateX(-50%);
 }
 
-
-.fsize{
-  font-size: 24px;
-  text-align: center;
+/* 全体のレイアウト */
+.login-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f6f9; /* 背景に淡いグレーを使用 */
+  font-family: 'Arial', sans-serif;
 }
 
+/* コンテナ */
 .container {
-  width: 300px;
-  margin: 0 auto;
-  padding: 20px;
+  width: 350px;
+  padding: 30px;
   background-color: #ffffff;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* しっかりとしたシャドウを追加 */
+  text-align: center; /* テキストや要素の中央寄せ */
 }
 
-h2 {
+/* フォーム内のテキスト */
+.fsize {
+  font-size: 1.5rem;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
 }
 
+/* フォームの入力フィールド */
 input[type="text"],
 input[type="password"] {
-  width: 93%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #d1d1d1;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
 }
 
+/* フォーカス時のエフェクト */
+input[type="text"]:focus,
+input[type="password"]:focus {
+  border-color: #3498db; /* 青色の強調 */
+  outline: none;
+}
+
+/* ログインボタン */
 button[type="submit"] {
   width: 100%;
-  padding: 10px;
-  background-color: #4CAF50;
+  padding: 12px;
+  background-color: #3498db;
   color: #ffffff;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  font-weight: bold;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
+/* ログインボタンホバー時 */
 button[type="submit"]:hover {
-  background-color: #45a049;
+  background-color: #2980b9; /* ホバー時の色 */
 }
 
+/* シャドウを追加 */
+button[type="submit"]:active {
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
 </style>
