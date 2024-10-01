@@ -4,6 +4,7 @@ import Home from '../components/Home.vue';
 import CompanyDetail from '../components/CompanyDetail.vue';
 import InterviewInfo from '../components/InterviewInfo.vue';
 import Login from '../components/Login.vue';
+import NotFoundComponent from '../components/NotFoundComponent.vue'
 
 const routes = [
   {
@@ -35,7 +36,12 @@ const routes = [
     name: 'Login' ,
     component: Login,
     props: true
-  }
+  },
+  {
+    path: '*', 
+    name: 'notFound',
+    component: NotFoundComponent 
+  } 
 ];
 
 const router = createRouter({
@@ -43,13 +49,5 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
-  if (to.matched.length === 0) {
-    // 404エラーページがマッチしない場合はログインページにリダイレクト
-    next({ name: 'Login' });
-  } else {
-    next();
-  }
-});
 
 export default router;
