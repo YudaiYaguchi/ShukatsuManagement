@@ -43,4 +43,13 @@ const router = createRouter({
   routes,
 });
 
+router.beforeEach((to, from, next) => {
+  if (to.matched.length === 0) {
+    // 404エラーページがマッチしない場合はログインページにリダイレクト
+    next({ name: 'Login' });
+  } else {
+    next();
+  }
+});
+
 export default router;
