@@ -16,9 +16,9 @@ let existingUserFlag = ref(false);
 
 const getUsers = async () => {
     let { data, error, status } = await supabase.from('Users').select('*');
-  console.log("all Users:",data);
+  // console.log("all Users:",data);
   users.value = data;
-  console.log("name:", users.value[0].name);
+  // console.log("name:", users.value[0].name);
 };
 
 getUsers();
@@ -45,19 +45,19 @@ const findUser = async () =>{
 }
 
 const updateUser = async () => {
-  console.log("userId.value:",userId.value);
-  const { data, error } = await supabase
-    .from('Users')
-    .update({ login: true })
-    .eq('id', userId.value)
-    .select('*');
+//  console.log("userId.value:",userId.value);
+ const { data, error } = await supabase
+   .from('Users')
+   .update({ login: true })
+   .eq('id', userId.value)
+   .select('*');
 
 };
 
 
 const  doLogin = async () => {
-    console.log("Username:", userName.value);
-    console.log("Password:", userPassword.value);
+    // console.log("Username:", userName.value);
+    // console.log("Password:", userPassword.value);
    
     for(let i = 0; i < users.value.length; i++) {
         console.log("pass:",users.value[i].password);
@@ -65,7 +65,7 @@ const  doLogin = async () => {
         //  alert("ログイン\nUsername：" + userName.value + "\nPassword："+ userPassword.value);
          existingUserFlag.value = true;
          userId.value = Number(users.value[i].id);
-         updateUser();
+      updateUser();
 
          router.push({ 
           name: 'Home', 
@@ -86,7 +86,7 @@ const  doLogin = async () => {
         createUser(userName.value,userPassword.value);
         const newUser = await findUser();
 
-        console.log("newUser:",newUser);
+        // console.log("newUser:",newUser);
         router.push({ 
           name: 'Home', 
           params: { 
