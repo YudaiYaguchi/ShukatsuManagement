@@ -28,13 +28,13 @@
   background-color: #4A90E2; /* 青ベースの背景色 */
 }
 
-h1 {
+.logout-container h1 {
   font-size: 2rem;
   color: white; /* 白い文字色 */
   margin-bottom: 1.5rem;
 }
 
-p {
+.logout-container p{
   color: white; /* 白い文字色 */
   font-size: 1rem;
   margin-bottom: 1rem;
