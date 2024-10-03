@@ -65,7 +65,7 @@ const  doLogin = async () => {
         //  alert("ログイン\nUsername：" + userName.value + "\nPassword："+ userPassword.value);
          existingUserFlag.value = true;
          userId.value = Number(users.value[i].id);
-      updateUser();
+         updateUser();
 
          router.push({ 
           name: 'Home', 

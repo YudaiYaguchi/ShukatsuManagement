@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted, onUnmounted, provide,defineProps } from 'vue';
+import { ref, onMounted, onUnmounted, provide,defineProps,watch } from 'vue';
+import { defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { supabase } from '../supabase';
 import Search from './Search.vue';
@@ -14,11 +15,12 @@ const router = useRouter();
 const userId = props.userId;
 const userName = props.userName;
 const loginStatus = ref(false);
+let getUserFlag = false;
 provide('userId', userId);
 provide('userName', userName);
 
 
-
+let timeoutId;
 let id = 0;
 const companiesName = ref([]);
 provide("companiesName", companiesName);
@@ -32,6 +34,26 @@ provide("editFlag", editFlag);
 
 let editId = ref(-1);
 provide("editId", editId);
+
+watch(() => loginStatus.value,(newValue) => {
+    console.log("watch triggered, loginStatus changed:", newValue);
+    console.log("getUserFlag:",getUserFlag);
+    if (newValue === false && getUserFlag ) {
+      // ログイン状態がfalseになったらログアウト画面に遷移
+      router.push({
+        name: 'Logout',
+      });
+    }
+  },
+  { immediate: true } // 初期化時に一度実行するためのオプション
+);
+
+const screenTransition = () =>{
+  router.push({
+         name: 'Logout',
+  });
+}
+
 
 const getCompanyName = async () => {
   let { data, error, status } = await supabase.from('CompaniesName').select('*').eq('userId', props.userId);
@@ -53,6 +75,9 @@ const getUser = async () =>{
   console.log("data[0].login",data[0].login);
   if (data[0].login) {
     getCompanyName();  // userが存在し、loginがtrueなら実行
+    getUserFlag = true;
+  }else{
+    screenTransition();
   }
 }
 
@@ -68,6 +93,7 @@ onMounted(async () => {
 // ページがリロードされたときにログアウトにする
 window.addEventListener('beforeunload', (event) => {
   logoutUser();
+  loginStatus.value = false
 });
 
 const logoutUser = async () => {
@@ -75,7 +101,22 @@ const logoutUser = async () => {
     .from('Users')
     .update({ login: false })
     .eq('id', props.userId);
+  
+    screenTransition();
 };
+
+
+function resetTimeout() {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(logoutUser, 3600000);
+}
+
+// 最初のタイムアウトをセット
+resetTimeout();
+
+// ユーザーの操作があった場合にタイムアウトをリセットする
+document.addEventListener('click', resetTimeout);
+document.addEventListener('keydown', resetTimeout);
 
 
 // 子コンポーネントからのデータを受け取ってcompaniesNameを更新
@@ -205,16 +246,7 @@ const getEditFlag = (id) => {
       </ul>
     </div>
   </div>
-</div>
-<div v-else-if="!loginStatus" class="logout-container">
-  <h1>ログアウト</h1>
-  <p>正常にログアウトしました。</p>
-  <p>
-    <span>
-      <a href="/" class="back-link">ログイン画面に戻る</a>
-    </span>
-  </p>
-</div>
+</div>  
 <div v-else>
   <p>Loading</p>
 </div>

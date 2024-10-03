@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onMounted ,defineProps,provide} from 'vue';
+import { ref, onMounted ,defineProps,provide,watch} from 'vue';
 import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { supabase } from '../supabase';
 import Menu from './Menu.vue'
 import InterviewInfo from './InterviewInfo.vue';
@@ -40,6 +41,11 @@ const clickInterviewFlag = ref(false);
 const rating = ref(0); // 初期評価
 let rate = ref(0);
 let allData ={};
+const loginStatus = ref(false);
+let getUserFlag = false;
+const router = useRouter();
+let timeoutId;
+
 
 
 const update = async (update_data) => {
@@ -110,11 +116,66 @@ const getCompanyInfo = async (id) => {
  
 };
 
+watch(() => loginStatus.value,(newValue) => {
+    console.log("watch triggered, loginStatus changed:", newValue);
+    console.log("getUserFlag:",getUserFlag);
+    if (newValue === false && getUserFlag ) {
+      // ログイン状態がfalseになったらログアウト画面に遷移
+      router.push({
+        name: 'Logout',
+      });
+    }
+  },
+  { immediate: true } // 初期化時に一度実行するためのオプション
+);
+
+const screenTransition = () =>{
+  router.push({
+         name: 'Logout',
+  });
+}
+
+const getUser = async () => {//ユーザーのログイン状況
+  let { data, error, status } = await supabase
+    .from('Users')
+    .select('*')
+    .eq('id',props.userId)
+
+  loginStatus.value = data[0].login;
+  console.log("loginStatus:",loginStatus.value);
+  console.log("data[0].login",data[0].login);
+  if (data[0].login === false) {
+    screenTransition();
+  }
+}
+
+const logoutUser = async () => {
+  const { data, error } = await supabase
+    .from('Users')
+    .update({ login: false })
+    .eq('id', props.userId);
+  
+  screenTransition();
+};
+
+function resetTimeout() {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(logoutUser, 3600000);
+}
+
+// 最初のタイムアウトをセット
+resetTimeout();
+
+// ユーザーの操作があった場合にタイムアウトをリセットする
+document.addEventListener('click', resetTimeout);
+document.addEventListener('keydown', resetTimeout);
+
 
 // コンポーネントがマウントされたときに企業情報を取得
 onMounted(() => {
   const id = route.params.id;
   getCompanyInfo(id);
+  getUser();
 });
 
 // フォームサブミット時にURLを更新する関数

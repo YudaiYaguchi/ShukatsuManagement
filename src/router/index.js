@@ -5,7 +5,7 @@ import CompanyDetail from '../components/CompanyDetail.vue';
 import InterviewInfo from '../components/InterviewInfo.vue';
 import Login from '../components/Login.vue';
 import NotFoundComponent from '../components/NotFoundComponent.vue'
-
+import Logout from '../components/Logout.vue';
 const routes = [
   {
     path: '/:userName/:userId/',
@@ -35,6 +35,12 @@ const routes = [
     path: '/',
     name: 'Login' ,
     component: Login,
+    props: true
+  },
+  {
+    path: '/logout',
+    name: 'Logout' ,
+    component: Logout,
     props: true
   },
   {
