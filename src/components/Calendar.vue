@@ -80,7 +80,7 @@ const addCalendar = async () => {
 <template>
 
   <div class="calendar">
-    <li v-if="showDate && calendar">{{ calendar }}-</li>
+    <li v-if="showDate && calendar" :style="{ color: 'red' }">{{ calendar }}-</li>
     <li v-else-if="showDate && firstFlag">{{ defaultText }}</li>
     <li v-else-if="showDate">{{ dateText }}-</li>
     <Datepicker v-else v-model="date"></Datepicker>

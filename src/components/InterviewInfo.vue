@@ -77,10 +77,6 @@ const getCompanyInfo = async () => {
   evaluation.value = companiesInfo.value[index.value].evaluation;
   reflection.value = companiesInfo.value[index.value].reflection;
   rate.value = companiesInfo.value[index.value].rate;
-  // console.log(interview.value)
-  // console.log('CompaniesInfo:',companiesInfo.value[index.value].content);
-  // console.log('getCompanyInfo:', companiesInfo.value);
-  // console.table(companiesInfo.value)
 };
 
 getCompanyInfo();
@@ -197,7 +193,7 @@ const addRate = async (event) => {
     </div>  
 
 
-<div class="interview" v-if="showSelected">
+<!-- <div class="interview" v-if="showSelected">
   選考結果：
   <div v-if="interview && firstFlag">{{ interview }}</div>
   <div v-else-if="selectedId">{{ interview }}</div>
@@ -216,7 +212,7 @@ const addRate = async (event) => {
   </select>
   <button class="textRight" @click="edit" style="float: right;">{{ editFlag ? '完了' : '編集' }}</button>
 </div>
-
+ -->
 
 
 

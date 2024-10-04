@@ -7,6 +7,8 @@ import Search from './Search.vue';
 import Menu from './Menu.vue';
 import Schedule from './Schedule.vue';
 import Calendar from './Calendar.vue';
+import SelectionType from './SelectionType.vue';
+import Result from './Result.vue';
 
 // propsを定義
 const props = defineProps(['userName','userId']);
@@ -36,16 +38,13 @@ let editId = ref(-1);
 provide("editId", editId);
 
 watch(() => loginStatus.value,(newValue) => {
-    console.log("watch triggered, loginStatus changed:", newValue);
-    console.log("getUserFlag:",getUserFlag);
     if (newValue === false && getUserFlag ) {
-      // ログイン状態がfalseになったらログアウト画面に遷移
       router.push({
         name: 'Logout',
       });
     }
   },
-  { immediate: true } // 初期化時に一度実行するためのオプション
+  { immediate: true } 
 );
 
 const screenTransition = () =>{
@@ -217,7 +216,9 @@ const getEditFlag = (id) => {
             <button class="textRight" @click="edit(company.id)"> 
               {{ getEditFlag(company.id) ? '完了' : '編集' }}
             </button>
-          </div> 
+          </div>
+          <div class="selectionType">選考種類：<SelectionType :companyId="company.id" :isEditing="getEditFlag(company.id)" /></div>
+          <div class="result">選考結果：<Result :companyId="company.id" :isEditing="getEditFlag(company.id)" /></div>
           <div class="schedule">選考状況：<Schedule :companyId="company.id" :isEditing="getEditFlag(company.id)" class="schedule"/></div>
           <div class="calrendar">
             <div class="date">選考日付：</div>
@@ -237,6 +238,8 @@ const getEditFlag = (id) => {
               {{ getEditFlag(company.id) ? '完了' : '編集' }}
             </button>
           </div>
+          <div class="selectionType">選考種類：<SelectionType :companyId="company.id" :isEditing="getEditFlag(company.id)" /></div>
+          <div class="result">選考結果：<Result :companyId="company.id" :isEditing="getEditFlag(company.id)" /></div>
           <div class="schedule">選考状況：<Schedule :companyId="company.id" :isEditing="getEditFlag(company.id)" /></div>
            <div class="calrendar">
             <div class="date">選考日付：</div>
@@ -302,6 +305,20 @@ body {
 }
 
 .schedule {
+  padding-top: 0px;
+  display: flex;
+  flex-direction: row; /* Flex items を一行に並べる */
+  white-space: nowrap; /* 改行を防ぐ */
+}
+
+.selectionType{
+  padding-top: 0px;
+  display: flex;
+  flex-direction: row; /* Flex items を一行に並べる */
+  white-space: nowrap; /* 改行を防ぐ */
+}
+
+.result{
   padding-top: 0px;
   display: flex;
   flex-direction: row; /* Flex items を一行に並べる */

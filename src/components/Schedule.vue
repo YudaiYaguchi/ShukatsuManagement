@@ -28,8 +28,6 @@ const optionStatus = ref([
   { id: 7, name: '三次面接'},
   { id: 8, name: '四次面接'},
   { id: 9, name: '最終面接'},
-  { id: 10, name: '内々定'},
-  { id: 11, name: '内定'}
 ]);
 
 watch(() => props.isEditing, () =>{
