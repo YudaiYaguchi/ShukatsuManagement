@@ -14,11 +14,22 @@ const confirmPassword = ref("");
 let existingUserFlag = false;
 
 
+const analytics = async() =>{
+  let { data, error, status } = await supabase.from('Analytics').select('*');
+  await supabase
+   .from('Analytics')
+   .update({
+      total_login: data[0].total_login + 1,
+      total_user: data[0].total_user + 1
+   })
+   .eq('id', 0)
+   .select('*');
+}
+
+
 const getUsers = async () => {
     let { data, error, status } = await supabase.from('Users').select('*');
-  // console.log("all Users:",data);
     users.value = data;
-  // console.log("name:", users.value[0].name);
 };
 
 getUsers();
@@ -69,6 +80,7 @@ const doLogin = async() =>{
     alert("新規ユーザーが作成されました。");    
     createUser(userName.value,userPassword.value);
     const newUser = await findUser();
+    analytics();
     router.push({ 
       name: 'Home', 
       params: { 

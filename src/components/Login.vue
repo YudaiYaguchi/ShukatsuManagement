@@ -12,39 +12,48 @@ const userPassword = ref("");
 const router = useRouter();
 let existingUserFlag = ref(false);
 
+const analytics = async() =>{
+  let { data, error, status } = await supabase.from('Analytics').select('*');
+  await supabase
+   .from('Analytics')
+   .update({
+      total_login: data[0].total_login + 1,
+      total_user: users.value.length
+   })
+   .eq('id', 0)
+   .select('*');
+}
+
 
 
 const getUsers = async () => {
     let { data, error, status } = await supabase.from('Users').select('*');
-  // console.log("all Users:",data);
     users.value = data;
-  // console.log("name:", users.value[0].name);
 };
 
 getUsers();
 
 
-const updateUser = async () => {
-//  console.log("userId.value:",userId.value);
+const updateUser = async (index) => {
  const { data, error } = await supabase
    .from('Users')
-   .update({ login: true })
+   .update({
+      login: true, 
+      loginCount: Number(users.value[index].loginCount) + 1 
+   })
    .eq('id', userId.value)
    .select('*');
-
+   
 };
 
 
 const  doLogin = async () => {
-    // console.log("Username:", userName.value);
-    // console.log("Password:", userPassword.value);
-   
     for(let i = 0; i < users.value.length; i++) {
       if(users.value[i].password === userPassword.value && users.value[i].name === userName.value){
          existingUserFlag.value = true;
          userId.value = Number(users.value[i].id);
-         updateUser();
-
+         updateUser(i);
+         analytics();
          router.push({ 
           name: 'Home', 
           params: { 
@@ -84,7 +93,6 @@ const  doLogin = async () => {
 </template>
 
 <style scoped>
-/* h1のスタイルをそのまま維持 */
 h1 {
   position: relative;
   color: #150063;
@@ -107,8 +115,6 @@ h1:before {
   border-right-color: transparent;
   transform: translateX(-50%);
 }
-
-/* 全体のレイアウト */
 .login-wrapper {
   display: flex;
   flex-direction: column;
