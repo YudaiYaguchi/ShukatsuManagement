@@ -57,7 +57,7 @@ const getCompanyInfo = async () => {
   }
   companiesInfo.value = data;
   index.value = companiesInfo.value.findIndex((company) => company.id === props.companyId);
-  selectionType.value = companiesInfo.value[index.value].selectionType;
+  selectionType.value = companiesInfo.value[index.value].selection_type;
 };
 
 getCompanyInfo();
