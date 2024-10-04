@@ -10,8 +10,8 @@ const userId = ref(-1);
 const userName = ref("");
 const userPassword = ref("");
 const router = useRouter();
-let existingUserFlag = ref(false);
-
+const confirmPassword = ref("");
+let existingUserFlag = false;
 
 
 const getUsers = async () => {
@@ -23,62 +23,78 @@ const getUsers = async () => {
 
 getUsers();
 
-
-const updateUser = async () => {
-//  console.log("userId.value:",userId.value);
- const { data, error } = await supabase
-   .from('Users')
-   .update({ login: true })
-   .eq('id', userId.value)
-   .select('*');
-
-};
-
-
-const  doLogin = async () => {
-    // console.log("Username:", userName.value);
-    // console.log("Password:", userPassword.value);
-   
-    for(let i = 0; i < users.value.length; i++) {
-      if(users.value[i].password === userPassword.value && users.value[i].name === userName.value){
-         existingUserFlag.value = true;
-         userId.value = Number(users.value[i].id);
-         updateUser();
-
-         router.push({ 
-          name: 'Home', 
-          params: { 
-            userId: Number(userId.value), 
-            userName: users.value[i].name 
-          } 
-        });
-        break;
-      }
-    }
-
-    if(userName.value.length === 0 || userPassword.value.length === 0){
-        alert("UsernameまたはPasswordが入力されていません。");
-    }else if(!existingUserFlag.value){
-        alert("UsernameまたはPasswordが間違っています。") 
-    }
+const findUser = async () =>{
+  let { data, error, status } = await supabase
+    .from('Users')
+    .select('*')
+    .eq('name', userName.value)        // userName に一致するユーザー
+    .eq('password', userPassword.value); // userPassword に一致するユーザー
+  
+    return data;
 }
 
+const createUser = async (userName,userPassword) => {
+  const { data, error } = await supabase
+        .from('Users')
+        .insert([{ 
+          name: userName, 
+          password: userPassword,
+          login: true
+        }])
 
+}
 
+const resetText  = () =>{
+  userName.value = "";
+  userPassword.value = "";
+  confirmPassword.value = "";
+  existingUserFlag = false;
+}
 
+const doLogin = async() =>{
+  for(let i=0;i<users.value.length;i++){
+    if(userName.value === users.value[i].name){
+      existingUserFlag = true;
+      break;
+    }
+  }
 
+  if(existingUserFlag){
+    alert("Username:"+ userName.value + "は既に使用されています。");
+  }else if(userName.value.length === 0 || userPassword.value.length === 0){
+    alert("UsernameまたはPasswordが入力されていません。");
+  }else if(userPassword.value !== confirmPassword.value){
+    alert("PasswordとConfirm Passwordは同一のものを入力してください。");
+  }else{
+    alert("新規ユーザーが作成されました。");    
+    createUser(userName.value,userPassword.value);
+    const newUser = await findUser();
+    router.push({ 
+      name: 'Home', 
+      params: { 
+        userId: Number(newUser[0].id), 
+        userName: newUser[0].name 
+      } 
+    });
+  }
+
+  resetText();
+}
 </script>
+
 <template>
-  <div class="login-wrapper"> 
+<div class="login-wrapper">
     <div class="container">
-      <h1>就活管理</h1> 
+      <h1>就活管理</h1>
       <form @submit.prevent="doLogin">
-        <p class="fsize">ログイン</p>
+        <p class="fsize" >新規ユーザー作成</p>
         <input type="text" placeholder="Username" v-model="userName">
         <input type="password" placeholder="Password" v-model="userPassword" />
-        <button type="submit">ログイン</button>
+        <input type="password" placeholder="Confirm Password" v-model="confirmPassword" />
+
+        <button type="submit">アカウント作成</button>
       </form>
-      <router-link :to="'/create-user'">Create an account</router-link>
+      <router-link :to="'/'">Login your account</router-link>
     </div>
   </div>
 </template>

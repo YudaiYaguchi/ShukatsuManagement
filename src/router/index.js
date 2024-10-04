@@ -6,9 +6,10 @@ import InterviewInfo from '../components/InterviewInfo.vue';
 import Login from '../components/Login.vue';
 import NotFoundComponent from '../components/NotFoundComponent.vue'
 import Logout from '../components/Logout.vue';
+import CreateUser from '../components/CreateUser.vue';
 const routes = [
   {
-    path: '/:userName/:userId/',
+    path: '/:userName/:userId',
     name: 'Home',
     component: Home,
     props: true,
@@ -41,6 +42,12 @@ const routes = [
     path: '/logout',
     name: 'Logout' ,
     component: Logout,
+    props: true
+  },
+  {
+    path: '/create-user',
+    name: 'CreateUser' ,
+    component: CreateUser,
     props: true
   },
   {
