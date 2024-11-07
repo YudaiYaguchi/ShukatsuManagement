@@ -50,10 +50,8 @@ const getCompanyInfo = async () => {
     return;
   }
   companiesInfo.value = data;
-  index.value = companiesInfo.value.findIndex((company) => company.id === props.companyId);
+  index.value    = companiesInfo.value.findIndex((company) => company.id === props.companyId);
   calendar.value = companiesInfo.value[index.value].calendar;
-  // console.log(calendar.value)
-//  console.log('getCompanyInfo:', companiesInfo.value);
 };
 
 
@@ -61,12 +59,14 @@ const getCompanyInfo = async () => {
 getCompanyInfo();
 
 const addCalendar = async () => {
-  // console.log('currentDate:',currentDate.value);
-  // console.log('dateText:',dateText.value) 
   if(currentDate.value != dateText.value){
-  const { data, error } = await supabase.from('CompaniesName').update([{ calendar: dateText.value }]).eq('id', props.companyId).select('id');
+  const { data, error } = await supabase
+    .from('CompaniesName')
+    .update([{ calendar: dateText.value }])
+    .eq('id', props.companyId).select('id');
+
   companiesInfo.value.unshift(data[0]);
-  calendar.value = dateText.value;
+  calendar.value  = dateText.value;
   firstFlag.value = false;
 
   if (error) {

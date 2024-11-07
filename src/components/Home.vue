@@ -11,31 +11,55 @@ import SelectionType from './SelectionType.vue';
 import Result from './Result.vue';
 
 // propsを定義
-const props = defineProps(['userName','userId']);
-
-const router = useRouter();
-const userId = props.userId;
+const props    = defineProps(['userName','userId']);
+const userId   = props.userId;
 const userName = props.userName;
-const loginStatus = ref(false);
-let getUserFlag = false;
-provide('userId', userId);
-provide('userName', userName);
 
+
+const router      = useRouter();
+const loginStatus = ref(false);
+const isMobile    = ref(false);
+let getUserFlag   = false;
+const editFlag    = ref([]); 
 
 let timeoutId;
 let id = 0;
 const companiesName = ref([]);
+const companyName   = ref('');
+const companyInfo   = ref(null);
+let   editId        = ref(-1);
+
+provide('userId', userId);
+provide('userName', userName);
 provide("companiesName", companiesName);
-const companyName = ref('');
-const companyInfo = ref(null);
 provide("companyInfo", companyInfo);
-
-const isMobile = ref(false);
-const editFlag = ref([]); 
 provide("editFlag", editFlag);
-
-let editId = ref(-1);
 provide("editId", editId);
+
+
+
+onMounted(async () => {
+  handleResize();
+  window.addEventListener('resize', handleResize);
+  await getUser(); 
+});
+
+
+// Logoutの処理
+// ページがリロードされたときにログアウトにする
+window.addEventListener('beforeunload', (event) => {
+  logoutUser();
+  loginStatus.value = false
+});
+
+const logoutUser = async () => {
+  const { data, error } = await supabase
+    .from('Users')
+    .update({ login: false })
+    .eq('id', userId);
+  
+    screenTransition();
+};
 
 watch(() => loginStatus.value,(newValue) => {
     if (newValue === false && getUserFlag ) {
@@ -53,56 +77,11 @@ const screenTransition = () =>{
   });
 }
 
-
-const getCompanyName = async () => {
-  let { data, error, status } = await supabase.from('CompaniesName').select('*').eq('userId', props.userId);
-  console.log("all data:",data);
-  data.sort((a, b) => a.order - b.order);
-  editFlag.value = data.map(() => false);
-  companiesName.value = data;
-
-};
-
-const getUser = async () =>{
-  let { data, error, status } = await supabase
-    .from('Users')
-    .select('*')
-    .eq('id',props.userId)
-
-  loginStatus.value = data[0].login;
-  console.log("loginStatus:",loginStatus.value);
-  console.log("data[0].login",data[0].login);
-  if (data[0].login) {
-    getCompanyName();  // userが存在し、loginがtrueなら実行
-    getUserFlag = true;
-  }else{
-    screenTransition();
-  }
-}
-
-
-
-onMounted(async () => {
-  await getUser();  // ユーザー情報の取得を待つ
-});
-
-
-//getCompanyName();
-
 // ページがリロードされたときにログアウトにする
 window.addEventListener('beforeunload', (event) => {
   logoutUser();
   loginStatus.value = false
 });
-
-const logoutUser = async () => {
-  const { data, error } = await supabase
-    .from('Users')
-    .update({ login: false })
-    .eq('id', props.userId);
-  
-    screenTransition();
-};
 
 
 function resetTimeout() {
@@ -118,18 +97,43 @@ document.addEventListener('click', resetTimeout);
 document.addEventListener('keydown', resetTimeout);
 
 
-// 子コンポーネントからのデータを受け取ってcompaniesNameを更新
-const updateCompaniesName = (newData) => {
-  companiesName.value = newData;
+const getCompanyName = async () => {
+  let { data, error, status } = await supabase
+    .from('CompaniesName')
+    .select('*')
+    .eq('userId', props.userId);
+
+  console.log("all data:",data);
+  data.sort((a, b) => a.order - b.order);
+  editFlag.value = data.map(() => false);
+  companiesName.value = data;
+
 };
+
+const getUser = async () =>{
+  let { data, error, status } = await supabase
+    .from('Users')
+    .select('*')
+    .eq('id',userId)
+
+  loginStatus.value = data[0].login;
+ 
+  if (loginStatus.value) {
+    getCompanyName();  // userが存在し、loginがtrueなら実行
+    getUserFlag = true;
+  }else{
+    screenTransition();
+  }
+}
+
+
 
 
 const addCompany = async () => {
   if (companyName.value.length !== 0 && companyName.value.trim() !== '') {
     const { data, error } = await supabase
     .from('CompaniesName')
-    .insert([{ companyName: companyName.value,
-                userId: props.userId}])
+    .insert([{ companyName: companyName.value,userId: props.userId}])
     .select('*');
 
     companiesName.value.unshift(data[0]);
@@ -140,34 +144,21 @@ const addCompany = async () => {
   }
 };
 
-const deleteCompanyName = async (id) => {
+const deleteCompanyInfo = async (id) => {
   const result = window.confirm('本当に削除してもよろしいですか？\n削除された企業情報は復元できません。');
 if(result){
-  const { data, error } = await supabase.from('CompaniesName').delete().eq('id', id).select('id');
+  const { data, error } = await supabase
+    .from('CompaniesName')
+    .delete()
+    .eq('id', id)
+    .select('id');
+
   const index = companiesName.value.findIndex((company) => company.id === data[0].id);
   companiesName.value.splice(index, 1);
   editFlag.value.splice(index, 1);
 }
 };
-
-const updateCompanyName = async (companyName) => {
-  const { data, error } = await supabase.from('CompaniesName').update({ completed: companyName.completed }).eq('id', companyName.id).select('*');
-  const index = companiesName.value.findIndex((company) => company.id === data[0].id);
-  companiesName.value[index].completed = data[0].completed;
-};
-
-const handleResize = () => {
-  isMobile.value = window.innerWidth <= 768;
-};
-
-onMounted(() => {
-  handleResize();
-  window.addEventListener('resize', handleResize);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize);
-});
+2
 
 const edit = (id) => {
   const index = companiesName.value.findIndex((company) => company.id === id);
@@ -177,8 +168,20 @@ const edit = (id) => {
 
 const getEditFlag = (id) => {
   const index = companiesName.value.findIndex((company) => company.id === id);
+  console.log("editFlag:",editFlag.value);
   return editFlag.value[index];
 };
+
+
+//画面サイズに応じて表示を切り替える
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 768;
+};
+
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
+});
 </script>
 
 <template>
@@ -212,7 +215,7 @@ const getEditFlag = (id) => {
         <li v-for="company in companiesName" :key="company.id" :style="company.completed ? 'text-decoration:line-through;' : ''">
           <div>
             企業名：<span><router-link :to="'/company-detail/' + props.userName + '/' + Number(props.userId)   + '/' + company.id">{{ company.companyName }}</router-link>　</span>
-            <button v-if="getEditFlag(company.id)" class="button" @click="deleteCompanyName(company.id)">削除</button>
+            <button v-if="getEditFlag(company.id)" class="button" @click="deleteCompanyInfo(company.id)">削除</button>
             <button class="textRight" @click="edit(company.id)"> 
               {{ getEditFlag(company.id) ? '完了' : '編集' }}
             </button>
@@ -233,7 +236,7 @@ const getEditFlag = (id) => {
         <li v-for="company in companiesName" :key="company.id" :style="company.completed ? 'text-decoration:line-through;' : ''">
           <div>
             企業名：<span><router-link :to="'/company-detail/' + props.userName + '/' + Number(props.userId)   + '/' + company.id">{{ company.companyName }}</router-link>　</span>
-            <button v-if="getEditFlag(company.id)" class="button" @click="deleteCompanyName(company.id)">削除</button>
+            <button v-if="getEditFlag(company.id)" class="button" @click="deleteCompanyInfo(company.id)">削除</button>
             <button  class="textRight" @click="edit(company.id)"> 
               {{ getEditFlag(company.id) ? '完了' : '編集' }}
             </button>

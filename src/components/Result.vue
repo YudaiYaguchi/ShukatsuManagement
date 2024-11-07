@@ -7,15 +7,13 @@ const props = defineProps({
   isEditing: Boolean
 });
 
-
-// 選択された選考状況
-const selectedStatus = ref('');
-const showSelected = ref(true);
+let index    = ref();
 const result = ref('');
-let index = ref();
-const companiesInfo = ref([]);
-let firstFlag = ref(true);
-let selectedName = ref('');
+const selectedStatus = ref('');
+const companiesInfo  = ref([]);
+let selectedName     = ref('');
+const showSelected   = ref(true);
+let firstFlag        = ref(true);
 
 // 選考状況のオプションリスト
 const optionStatus = ref([
@@ -35,10 +33,9 @@ watch(() => props.isEditing, () =>{
 const selectedId = computed(() => {
   // selectedStatus.value が空の場合、または optionStatus 内に一致する項目がない場合に対応
   const selected = optionStatus.value.find(status => status.name === selectedStatus.value);
-  // console.log('selectedName:',selectedName.value)
+  
   if (selected) {
     selectedName.value = selected.name;
-    // console.log(selected.name);
     firstFlag.value = false;
     result.value = selected.name;
     addResult();
@@ -70,10 +67,6 @@ const addResult = async () => {
     .eq('id', props.companyId)
     .select('id');
   
-  if (error) {
-    console.error("Error adding selection_type:", error);
-    return;
-  }
   companiesInfo.value[index.value] = data[0];
 };
 
@@ -103,7 +96,7 @@ const addResult = async () => {
 <style scoped>
 .result {
   display: flex;
-  flex-direction: row; /* Flex items を一行に並べる */
-  white-space: nowrap; /* 改行を防ぐ */
+  flex-direction: row; 
+  white-space: nowrap;
 }
 </style>

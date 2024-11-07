@@ -159,7 +159,7 @@ input[type="password"] {
 /* フォーカス時のエフェクト */
 input[type="text"]:focus,
 input[type="password"]:focus {
-  border-color: #3498db; /* 青色の強調 */
+  border-color: #3498db; 
   outline: none;
 }
 
@@ -179,7 +179,7 @@ button[type="submit"] {
 
 /* ログインボタンホバー時 */
 button[type="submit"]:hover {
-  background-color: #2980b9; /* ホバー時の色 */
+  background-color: #2980b9;
 }
 
 /* シャドウを追加 */

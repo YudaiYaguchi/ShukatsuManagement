@@ -164,11 +164,6 @@ const addRate = async (event) => {
     .eq('id', props.id)
     .select('*');
 
-  if (error) {
-    console.error('Error updating company ES:', error);
-  } else {
-    // console.log('Updated record:', data);
-  }
   companiesInfo.value[index.value] = data[0];
 };
 </script>
@@ -192,53 +187,26 @@ const addRate = async (event) => {
     {{ rate }}
     </div>  
 
-
-<!-- <div class="interview" v-if="showSelected">
-  選考結果：
-  <div v-if="interview && firstFlag">{{ interview }}</div>
-  <div v-else-if="selectedId">{{ interview }}</div>
-  <div v-else style="padding-right: 10px;">未選択</div>
-  <button class="textRight" @click="edit" >{{ editFlag ? '完了' : '編集' }}</button>
-  </div>
-<div class="interview" v-else>
-  選考結果：
-  <select v-model="selectedStatus">
-    <option disabled value="">選考結果</option>
-    <option v-for="status in optionStatus" 
-            :value="status.name" 
-            :key="status.id">
-      {{ status.name }}
-    </option>
-  </select>
-  <button class="textRight" @click="edit" style="float: right;">{{ editFlag ? '完了' : '編集' }}</button>
-</div>
- -->
-
-
-
-<form>
-  <label for="interviewContent">面接内容</label>
-    <div class="form-group" v-if="companiesInfo.content != null">
-      <textarea 
-        @input="addContent" 
-        id="interviewContent" 
-        v-model="content" 
-        :placeholder="textInfo[0].message"
-        class="input-box">
-      </textarea>
-    </div>
-    <div v-else>
-      <textarea 
-        @input="addContent" 
-        id="interviewContent" 
-        v-model="content"  
-        :placeholder="textInfo[0].message"
-        class="input-box">
-      </textarea>
-    </div>
-
-
-
+    <form>
+      <label for="interviewContent">面接内容</label>
+        <div class="form-group" v-if="companiesInfo.content != null">
+          <textarea 
+            @input="addContent" 
+            id="interviewContent" 
+            v-model="content" 
+            :placeholder="textInfo[0].message"
+            class="input-box">
+          </textarea>
+        </div>
+        <div v-else>
+          <textarea 
+            @input="addContent" 
+            id="interviewContent" 
+            v-model="content"  
+            :placeholder="textInfo[0].message"
+            class="input-box">
+          </textarea>
+        </div>
       <div class="form-group" v-if="companiesInfo.evaluation">
         <label for="selfEvaluation">面接自己評価</label>
         <textarea @input="addEvaluation" :placeholder="textInfo[1].message" id="selfEvaluation" v-model="evaluation" class="input-box"></textarea>
@@ -263,8 +231,6 @@ const addRate = async (event) => {
 <style scoped>
 .interview {
   display: flex;
-  /* flex-direction: row; Flex items を一行に並べる */
-  /* white-space: nowrap; 改行を防ぐ */
 }
 </style>
 

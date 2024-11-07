@@ -8,14 +8,13 @@ const props = defineProps({
 });
 
 
-// 選択された選考状況
-const selectedStatus = ref('');
-const showSelected = ref(true);
+let index      = ref();
 const schedule = ref('');
-let index = ref();
-const companiesInfo = ref([]);
-let firstFlag = ref(true);
-let selectedName = ref('');
+const selectedStatus = ref('');
+const companiesInfo  = ref([]);
+let selectedName     = ref('');
+const showSelected = ref(true);
+let firstFlag      = ref(true);
 
 // 選考状況のオプションリスト
 const optionStatus = ref([
@@ -36,14 +35,12 @@ watch(() => props.isEditing, () =>{
 })
 
 
-// 選択されたIDを取得
+
 const selectedId = computed(() => {
-  // selectedStatus.value が空の場合、または optionStatus 内に一致する項目がない場合に対応
   const selected = optionStatus.value.find(status => status.name === selectedStatus.value);
-  // console.log('selectedName:',selectedName.value)
+
   if (selected) {
     selectedName.value = selected.name;
-    // console.log(selected.name);
     firstFlag.value = false;
     schedule.value = selected.name;
     addSchedule();
@@ -57,23 +54,18 @@ const selectedId = computed(() => {
 
 const getCompanyInfo = async () => {
   let { data, error} = await supabase.from('CompaniesName').select('*');
-  if (error) {
-    console.error("Error fetching company info:", error);
-    return;
-  }
+
   companiesInfo.value = data;
   index.value = companiesInfo.value.findIndex((company) => company.id === props.companyId);
   schedule.value = companiesInfo.value[index.value].schedule;
-  // console.log(schedule.value)
-//  console.log('getCompanyInfo:', companiesInfo.value);
 };
 
 getCompanyInfo();
 
 const addSchedule = async () => {
   const { data, error } = await supabase
-    .from('CompaniesName') // テーブル名のキャピタライゼーションに注意
-    .update({ schedule: selectedName.value }) // "calendar" フィールドを更新
+    .from('CompaniesName')
+    .update({ schedule: selectedName.value })
     .eq('id', props.companyId)
     .select('id');
   
@@ -111,7 +103,7 @@ const addSchedule = async () => {
 <style scoped>
 .schedule {
   display: flex;
-  flex-direction: row; /* Flex items を一行に並べる */
-  white-space: nowrap; /* 改行を防ぐ */
+  flex-direction: row; 
+  white-space: nowrap;
 }
 </style>

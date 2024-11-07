@@ -4,14 +4,13 @@ import { supabase } from '../supabase';
 import { useRouter } from 'vue-router';
 import Home from  './Home.vue'
 
-
-const users = ref([]);
-const userId = ref(-1);
+const router   = useRouter();
+const users    = ref([]);
+const userId   = ref(-1);
 const userName = ref("");
-const userPassword = ref("");
-const router = useRouter();
+const userPassword    = ref("");
 const confirmPassword = ref("");
-let existingUserFlag = false;
+let existingUserFlag  = false;
 
 
 const analytics = async() =>{
@@ -38,9 +37,8 @@ const findUser = async () =>{
   let { data, error, status } = await supabase
     .from('Users')
     .select('*')
-    .eq('name', userName.value)        // userName に一致するユーザー
-    .eq('password', userPassword.value); // userPassword に一致するユーザー
-  
+    .eq('name', userName.value)      
+    .eq('password', userPassword.value); 
     return data;
 }
 
@@ -52,14 +50,13 @@ const createUser = async (userName,userPassword) => {
           password: userPassword,
           login: true
         }])
-
 }
 
 const resetText  = () =>{
-  userName.value = "";
-  userPassword.value = "";
+  userName.value        = "";
+  userPassword.value    = "";
   confirmPassword.value = "";
-  existingUserFlag = false;
+  existingUserFlag      = false;
 }
 
 const doLogin = async() =>{
@@ -112,7 +109,7 @@ const doLogin = async() =>{
 </template>
 
 <style scoped>
-/* h1のスタイルをそのまま維持 */
+
 h1 {
   position: relative;
   color: #150063;
@@ -136,18 +133,17 @@ h1:before {
   transform: translateX(-50%);
 }
 
-/* 全体のレイアウト */
+
 .login-wrapper {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f4f6f9; /* 背景に淡いグレーを使用 */
+  background-color: #f4f6f9;
   font-family: 'Arial', sans-serif;
 }
 
-/* コンテナ */
 .container {
   width: 350px;
   padding: 30px;

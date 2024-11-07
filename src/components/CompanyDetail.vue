@@ -7,11 +7,6 @@ import Menu from './Menu.vue'
 import InterviewInfo from './InterviewInfo.vue';
 
 
-// // Propsの定義
-// const props = defineProps({
-//   id: String,
-// });
-
 const props = defineProps({
   userName: String,
   userId: Number, // userIdも数値か文字列で受け取れるようにする
@@ -19,11 +14,6 @@ const props = defineProps({
   
 });
 
-onMounted(() => {
-  console.log("Company ID:", props.id);
-  console.log("User Name:", props.userName);
-  console.log("User ID:", props.userId);
-});
 
 // Vue Routerからのルートパラメータ取得
 const route = useRoute();
@@ -39,7 +29,7 @@ const flag = ref(true);
 const clickCompanyFlag = ref(true);
 const clickInterviewFlag = ref(false);
 const rating = ref(0); // 初期評価
-let rate = ref(0);
+
 let allData ={};
 const loginStatus = ref(false);
 let getUserFlag = false;
@@ -61,12 +51,6 @@ const update = async (update_data) => {
       .update({ order: record.order }) // order フィールドを更新
       .eq('id', record.id)
       .select('*');
-
-    if (error) {
-      console.error('Error updating order:', error.message, 'Record:', record);
-    } else {
-      // console.log('Updated Record Order:', data);
-    }
   }
 
   // order フィールドでレコードを取得してソート
@@ -74,12 +58,6 @@ const update = async (update_data) => {
     .from('CompaniesName')
     .select('*')
     .order('order', { ascending: true }); // order フィールドで昇順にソート
-
-  if (sortError) {
-    console.error('Error retrieving sorted data:', sortError.message);
-  } else {
-    // console.log('Sorted Data:', sortedData);
-  }
 };
 
 // 特定の企業情報を取得する関数
@@ -101,7 +79,11 @@ const getCompanyInfo = async (id) => {
     .update({ updated_at : currentDate }) 
     .eq('id', id)
     .select('*');
-  let { data: allData } = await supabase.from('CompaniesName').select('*').eq('userId',props.userId);
+
+  let { data: allData } = await supabase
+    .from('CompaniesName')
+    .select('*')
+    .eq('userId',props.userId);
     
   
   console.log('All Data:',allData);
@@ -255,11 +237,6 @@ const handleClickInterview = () => {
   clickCompanyFlag.value = false;
 };
 
-// 評価が変更されると呼ばれる関数
-const setRating = (newRating) => {
-  rating.value = newRating;
-  console.log("選択された評価:", rating.value); // コンソールに評価を表示
-};
 
 </script>
 
