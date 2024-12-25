@@ -26,7 +26,7 @@ console.log("User Name:", userName);
 				<li><router-link :to="'/' + userName + '/' + userId">HOME</router-link></li>
 				<li><router-link :to="'/' + userName + '/' + userId">選考状況</router-link></li>
 				<li><router-link :to="'/' + userName + '/' + userId">予定管理</router-link></li>
-				<li><router-link :to="'/' + userName + '/' + userId">ESまとめ</router-link></li>
+				<li><router-link :to="'/entry-sheet'">ESまとめ</router-link></li>
 				<li><router-link :to="'/' + userName + '/' + userId">上記の機能は近日中に追加予定</router-link></li>
 			</ul>
 		</div>

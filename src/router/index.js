@@ -7,6 +7,8 @@ import Login from '../components/Login.vue';
 import NotFoundComponent from '../components/NotFoundComponent.vue'
 import Logout from '../components/Logout.vue';
 import CreateUser from '../components/CreateUser.vue';
+import EntrySheet from '@/components/EntrySheet.vue';
+
 const routes = [
   {
     path: '/:userName/:userId',
@@ -42,6 +44,12 @@ const routes = [
     path: '/logout',
     name: 'Logout' ,
     component: Logout,
+    props: true
+  },
+  {
+    path: '/entry-sheet',
+    name: 'EntrySheet' ,
+    component: EntrySheet,
     props: true
   },
   {
